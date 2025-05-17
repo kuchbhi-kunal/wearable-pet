@@ -7,21 +7,16 @@
 #include <WebServer.h>
 #include <Update.h>
 
-// Initialize display - SH1106 OLED 128x64
-// Using SSD1306 as specified in your code
+// Initialize display - SH1106 or SSD1306 OLED 128x64
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 
-// WiFi credentials - REPLACE WITH YOUR OWN
 const char* ssid = "kunal";
 const char* password = "kunal1234";
 
-// Web server on port 80
 WebServer server(80);
-
-// Device name - change to something unique
+// Device name
 #define DEVICE_NAME "ESP32-Wearable"
 
-// Possible eye states/emotions
 enum EyeState {
   STATE_NEUTRAL,     // Normal, centered eyes
   STATE_ANGRY,       // Angled eyes, looking aggressive
@@ -36,7 +31,6 @@ enum EyeState {
   STATE_COUNT        // Used to count the number of states
 };
 
-// Eye parameters
 const int screenWidth = 128;
 const int screenHeight = 64;
 const int eyeBaseWidth = 30;     // Base width of eye - increased size
@@ -103,11 +97,7 @@ void setupWiFi();
 void setupOTA();
 void setupWebServer();
 void handleRoot();
-void handleNotFound();
 void handleEmotion();
-void handleUpdateForm();
-void handleUpdate();
-void handleDoUpdate();
 void drawStatusScreen(const String& line1, const String& line2 = "", const String& line3 = "");
 
 void setup() {
@@ -184,7 +174,7 @@ void loop() {
       blinkState = 1;
       lastBlinkTime = currentTime;
     } else {
-      // Reset the timer even if we don't blink this time
+      // Reset the timer even if it don't blink this time
       lastBlinkTime = currentTime;
     }
   }
@@ -272,6 +262,7 @@ void loop() {
 // Setup WiFi Connection
 void setupWiFi() {
   drawStatusScreen("Connecting to", ssid);
+  delay(4000);
   
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -298,15 +289,15 @@ void setupWiFi() {
       MDNS.addService("http", "tcp", 80);
     }
     
-    drawStatusScreen("WiFi Connected", "" + WiFi.localIP().toString());
-    delay(5000);  // Show IP for 2 seconds
+    drawStatusScreen("Connected", "" + WiFi.localIP().toString());
+    delay(3000);  // Show IP for 3 seconds
   } else {
     Serial.println("WiFi connection failed!");
-    drawStatusScreen("WiFi Failed", "Check credentials", "Will retry...");
+    drawStatusScreen("Failed", "to connect", "Will retry...");
     delay(2000);
   }
-  drawStatusScreen(" ","Hi", "I am Blinky");
-  delay(5000);
+  drawStatusScreen("Hi", "I am Blinky");
+  delay(3500);
 }
 
 // Setup OTA Updates
@@ -330,12 +321,12 @@ void setupOTA() {
     // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
     Serial.println("Start updating " + type);
     otaInProgress = true;
-    drawStatusScreen("Blinky Update", "Starting...");
+    drawStatusScreen("Update", "Starting...");
   });
   
   ArduinoOTA.onEnd([]() {
     Serial.println("\nOTA update complete!");
-    drawStatusScreen("Blinky Update", "Complete", "Restarting...");
+    drawStatusScreen("Update", "complete.", "Restarting.");
     delay(1000);
   });
   
@@ -346,7 +337,7 @@ void setupOTA() {
     // Update the display with progress
     u8g2.clearBuffer();
     u8g2.setFont(u8g2_font_9x15_tf);
-    u8g2.drawStr(0, 15, "Blinky Update");
+    u8g2.drawStr(0, 15, "Updating");
     
     // Draw progress bar
     u8g2.drawFrame(0, 25, 128, 10);
@@ -389,10 +380,6 @@ void setupWebServer() {
   // Define routes
   server.on("/", HTTP_GET, handleRoot);
   server.on("/emotion", HTTP_GET, handleEmotion);
-  server.on("/update", HTTP_GET, handleUpdateForm);
-  server.on("/doUpdate", HTTP_POST, handleUpdate, handleDoUpdate);
-  server.onNotFound(handleNotFound);
-  
   server.begin();
   Serial.println("Web server started");
 }
@@ -456,122 +443,6 @@ void handleEmotion() {
   } else {
     server.send(400, "text/plain", "Missing state parameter");
   }
-}
-
-void handleUpdateForm() {
-  String html = "<!DOCTYPE html><html><head>";
-  html += "<meta name='viewport' content='width=device-width, initial-scale=1.0'>";
-  html += "<title>ESP32 OTA Update</title>";
-  html += "<style>";
-  html += "body{font-family: Arial, sans-serif; margin: 0; padding: 20px; text-align: center;}";
-  html += "h1{color: #333;}";
-  html += ".container{max-width: 600px; margin: 0 auto; padding: 20px;}";
-  html += "form{background-color: #f9f9f9; padding: 20px; border-radius: 10px;}";
-  html += "input[type=file]{display: block; margin: 15px auto;}";
-  html += "input[type=submit]{background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;}";
-  html += "input[type=submit]:hover{background-color: #45a049;}";
-  html += ".back{display: inline-block; margin-top: 20px; color: #666; text-decoration: none;}";
-  html += ".back:hover{color: #333;}";
-  html += "</style>";
-  html += "</head><body>";
-  html += "<div class='container'>";
-  html += "<h1>ESP32 OTA Update</h1>";
-  html += "<form method='POST' action='/doUpdate' enctype='multipart/form-data'>";
-  html += "<input type='file' name='update' accept='.bin'>";
-  html += "<input type='submit' value='Update'>";
-  html += "</form>";
-  html += "<a class='back' href='/'>Back to Control Panel</a>";
-  html += "</div></body></html>";
-  
-  server.send(200, "text/html", html);
-}
-
-void handleUpdate() {
-  // Redirect back to the root page
-  server.sendHeader("Location", "/");
-  server.send(303);
-}
-
-void handleDoUpdate() {
-  // Handle the actual update process
-  HTTPUpload& upload = server.upload();
-  
-  if (upload.status == UPLOAD_FILE_START) {
-    Serial.printf("Update: %s\n", upload.filename.c_str());
-    otaInProgress = true;
-    
-    // Reset progress tracking variables
-    updateSize = 0;
-    updateProgress = 0;
-    
-    // Show update status on display
-    drawStatusScreen("Web Update", "Starting...");
-    
-    if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { //start with max available size
-      Update.printError(Serial);
-    }
-  } else if (upload.status == UPLOAD_FILE_WRITE) {
-    // Write received data to the firmware
-    if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
-      Update.printError(Serial);
-    }
-    
-    // Update progress tracking
-    updateProgress += upload.currentSize;
-    updateSize += upload.currentSize;
-    
-    // Calculate progress percentage
-    float progress = 0;
-    if (updateSize > 0) {
-      progress = (updateProgress * 100.0) / updateSize;
-    }
-    
-    // Update the display with progress
-    u8g2.clearBuffer();
-    u8g2.setFont(u8g2_font_9x15_tf);
-    u8g2.drawStr(0, 15, "Web Update");
-    
-    // Draw progress bar
-    u8g2.drawFrame(0, 25, 128, 10);
-    u8g2.drawBox(0, 25, (progress * 128) / 100, 10);
-    
-    // Display percentage
-    String percentStr = String((int)progress) + "%";
-    u8g2.drawStr(52, 50, percentStr.c_str());
-    u8g2.sendBuffer();
-    
-    Serial.printf("Progress: %d%%\n", (int)progress);
-  } else if (upload.status == UPLOAD_FILE_END) {
-    if (Update.end(true)) { //true to set the size to the current progress
-      Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
-      drawStatusScreen("Update Complete", "Rebooting...");
-    } else {
-      Update.printError(Serial);
-    }
-    otaInProgress = false;
-  } else if (upload.status == UPLOAD_FILE_ABORTED) {
-    Update.end();
-    otaInProgress = false;
-    Serial.println("Update was aborted");
-    drawStatusScreen("Update Aborted");
-  }
-}
-
-void handleNotFound() {
-  String message = "File Not Found\n\n";
-  message += "URI: ";
-  message += server.uri();
-  message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args();
-  message += "\n";
-  
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  }
-  
-  server.send(404, "text/plain", message);
 }
 
 // Utility function to display status on the OLED
