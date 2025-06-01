@@ -74,12 +74,12 @@ h1 {
 }
 
 .toggle-icon.manual img {
-  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%) hue-rotate(173deg) brightness(5%) contrast(87%);
+  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%) hue-rotate(173deg) brightness(65%) contrast(87%);
 }
 
 /* When manual mode is active - Auto icon inactive (gray), Manual icon active (orange) */
 .toggle-container.manual-active .toggle-icon.auto img {
-  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%) hue-rotate(173deg) brightness(95%) contrast(87%);
+  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%) hue-rotate(173deg) brightness(65%) contrast(87%);
 }
 
 .toggle-container.manual-active .toggle-icon.manual img {
@@ -90,12 +90,12 @@ h1 {
   position: relative;
   width: 60px;
   height: 30px;
-  background: linear-gradient(45deg, #2196f3, #1976d2);
+  /* background: linear-gradient(45deg, #2196f3, #1976d2); */
   border-radius: 30px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid #414141;
   cursor: pointer;
   transition: all 0.4s ease;
-  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+  box-shadow: 0 4px 15px rgba(33, 149, 243, 0.211);
 }
 
 .toggle-switch input {
@@ -110,7 +110,7 @@ h1 {
   left: 2px;
   width: 24px;
   height: 24px;
-  background: white;
+  background: #414141;
   border-radius: 50%;
   transition: all 0.4s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -126,8 +126,8 @@ h1 {
 }
 
 .toggle-container.manual-active .toggle-switch {
-  background: linear-gradient(45deg, #ff5722, #d84315);
-  box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+  /* background: linear-gradient(45deg, #ff5722, #d84315); */
+  box-shadow: 0 4px 15px rgba(255, 86, 34, 0.197);
 }
 
 .toggle-container.loading {
