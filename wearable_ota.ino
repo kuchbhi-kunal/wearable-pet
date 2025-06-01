@@ -398,7 +398,7 @@ void handleRoot() {
   html += "<title>ESP32 Wearable Control Panel</title>";
   
   // Link to external CSS hosted on GitHub via jsDelivr CDN
-  html += "<link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/wearable3.css'>";
+  html += "<link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/wearable5.css'>";
   
   html += "</head><body>";
   
@@ -407,14 +407,25 @@ void handleRoot() {
   html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet/hero.svg' style='width: 100%;'>";
   html += "</div>";
 
-  // Toggle switch with Auto/Manual labels
+  // Toggle switch with SVG icons
   html += "<div class='toggle-container' id='toggleContainer'>";
-  html += "<span class='toggle-label auto'>AUTO</span>";
+  
+  // Auto icon - using external SVG file
+  html += "<div class='toggle-icon auto' onclick='setAutoMode()'>";
+  html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/auto.svg' alt='Auto Mode'>";
+  html += "</div>";
+  
+  // Toggle switch
   html += "<label class='toggle-switch'>";
   html += "<input type='checkbox' id='modeToggle' onchange='toggleManual()'>";
   html += "<span class='slider'></span>";
   html += "</label>";
-  html += "<span class='toggle-label manual'>MANUAL</span>";
+  
+  // Manual icon - using external SVG file
+  html += "<div class='toggle-icon manual' onclick='setManualMode()'>";
+  html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/manual.svg' alt='Manual Mode'>";
+  html += "</div>";
+  
   html += "</div>";
 
   html += "<div class='grid' id='emotionGrid'>";
@@ -432,7 +443,7 @@ void handleRoot() {
   html += "</div>";
 
   // Link to external JavaScript hosted on GitHub via jsDelivr CDN
-  html += "<script src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/wearable3.js'></script>";
+  html += "<script src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/wearable4.js'></script>";
   
   html += "</body></html>";
 
