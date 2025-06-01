@@ -74,7 +74,7 @@ h1 {
 }
 
 .toggle-icon.manual img {
-  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%) hue-rotate(173deg) brightness(95%) contrast(87%);
+  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%) hue-rotate(173deg) brightness(5%) contrast(87%);
 }
 
 /* When manual mode is active - Auto icon inactive (gray), Manual icon active (orange) */
