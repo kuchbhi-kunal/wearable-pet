@@ -398,7 +398,7 @@ void handleRoot() {
   html += "<title>ESP32 Wearable Control Panel</title>";
   
   // Link to external CSS hosted on GitHub via jsDelivr CDN
-  html += "<link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/wearable2.css'>";
+  html += "<link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/wearable3.css'>";
   
   html += "</head><body>";
   
@@ -407,9 +407,17 @@ void handleRoot() {
   html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet/hero.svg' style='width: 100%;'>";
   html += "</div>";
 
-  html += "<button class='btn manual' onclick='toggleManual()' id='manualBtn'>Manual Mode</button><br><br>";
+  // Toggle switch with Auto/Manual labels
+  html += "<div class='toggle-container' id='toggleContainer'>";
+  html += "<span class='toggle-label auto'>AUTO</span>";
+  html += "<label class='toggle-switch'>";
+  html += "<input type='checkbox' id='modeToggle' onchange='toggleManual()'>";
+  html += "<span class='slider'></span>";
+  html += "</label>";
+  html += "<span class='toggle-label manual'>MANUAL</span>";
+  html += "</div>";
 
-  html += "<div class='grid'>";
+  html += "<div class='grid' id='emotionGrid'>";
   html += "<button class='btn' onclick='send(0)'>Neutral</button>";
   html += "<button class='btn' onclick='send(1)'>Angry</button>";
   html += "<button class='btn' onclick='send(2)'>Surprised</button>";
@@ -424,7 +432,7 @@ void handleRoot() {
   html += "</div>";
 
   // Link to external JavaScript hosted on GitHub via jsDelivr CDN
-  html += "<script src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet/wearable.js'></script>";
+  html += "<script src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/wearable3.js'></script>";
   
   html += "</body></html>";
 
