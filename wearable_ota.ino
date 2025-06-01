@@ -392,19 +392,20 @@ void setupWebServer() {
 
 // Web Server Route Handlers
 void handleRoot() {
-  String html = "<!DOCTYPE html><html><head>";
+  String html = "<!DOCTYPE html><html lang='en'><head>";
+  html += "<meta charset='UTF-8'>";
   html += "<meta name='viewport' content='width=device-width, initial-scale=1.0'>";
-  html += "<title>ESP32 Wearable</title>";
-  html += "<style>";
-  html += "body{font-family:Arial;margin:0;padding:20px;text-align:center;}";
-  html += "h1{color:#333;}";
-  html += ".btn{display:inline-block;background:#4CAF50;color:white;padding:10px 20px;margin:5px;border:none;border-radius:4px;cursor:pointer;font-size:16px;text-decoration:none;}";
-  html += ".btn:hover{background:#45a049;}";
-  html += ".manual{background:#2196F3;}";
-  html += ".manual:hover{background:#1976D2;}";
-  html += ".grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:400px;margin:0 auto;}";
-  html += "</style></head><body>";
-  html += "<h1>ESP32 Control</h1>";
+  html += "<title>ESP32 Wearable Control Panel</title>";
+  
+  // Link to external CSS hosted on GitHub via jsDelivr CDN
+  html += "<link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/wearable2.css'>";
+  
+  html += "</head><body>";
+  
+  // Hero image section
+  html += "<div class='hero-image' style='width: 100%; margin-top: 3rem; margin-bottom: 3rem;'>";
+  html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet/hero.svg' style='width: 100%;'>";
+  html += "</div>";
 
   html += "<button class='btn manual' onclick='toggleManual()' id='manualBtn'>Manual Mode</button><br><br>";
 
@@ -422,19 +423,10 @@ void handleRoot() {
   html += "<button class='btn' onclick='light()' id='lightBtn'>Reading Light</button>";
   html += "</div>";
 
-  html += "<script>";
-  html += "function send(s){fetch('/emotion?state='+s);}";
-  html += "function light(){fetch('/readinglight').then(r=>r.text()).then(d=>{";
-  html += "let b=document.getElementById('lightBtn');";
-  html += "if(d.includes('ON')){b.style.background='#ff9800';b.innerHTML='OFF';}";
-  html += "else{b.style.background='#4CAF50';b.innerHTML='Light';}";
-  html += "});}";
-  html += "function toggleManual(){fetch('/manual').then(r=>r.text()).then(d=>{";
-  html += "let b=document.getElementById('manualBtn');";
-  html += "if(d.includes('ON')){b.style.background='#ff5722';b.innerHTML='Auto Mode';}";
-  html += "else{b.style.background='#2196F3';b.innerHTML='Manual Mode';}";
-  html += "});}";
-  html += "</script></body></html>";
+  // Link to external JavaScript hosted on GitHub via jsDelivr CDN
+  html += "<script src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet/wearable.js'></script>";
+  
+  html += "</body></html>";
 
   server.send(200, "text/html", html);
 }
