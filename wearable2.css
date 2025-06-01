@@ -10,6 +10,7 @@ body {
 
 h1 {
   color: #fff;
+  /* text-shadow: 2px 2px 4px rgba(0,0,0,0.3); */
   font-size: 2.5em;
   margin-bottom: 30px;
 }
@@ -40,42 +41,15 @@ h1 {
   transform: translateY(0);
 }
 
-.btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.4;
-}
-
 .manual {
   background: linear-gradient(45deg, #2196f3, #1976d2);
   font-size: 18px;
   padding: 18px 30px;
   margin-bottom: 20px;
-  text-transform: none;
-  letter-spacing: normal;
-  position: relative;
-  transition: all 0.4s ease;
 }
 
-.manual.auto-mode {
-  background: linear-gradient(45deg, #2196f3, #1976d2);
-  border: 2px solid rgba(33, 150, 243, 0.3);
-}
-
-.manual.auto-mode:hover {
+.manual:hover {
   background: linear-gradient(45deg, #1976d2, #1565c0);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
-}
-
-.manual.manual-mode {
-  background: linear-gradient(45deg, #ff5722, #d84315);
-  border: 2px solid rgba(255, 87, 34, 0.3);
-}
-
-.manual.manual-mode:hover {
-  background: linear-gradient(45deg, #d84315, #bf360c);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 87, 34, 0.4);
 }
 
 .grid {
@@ -85,46 +59,37 @@ h1 {
   max-width: 600px;
   margin: 0px auto;
   padding: 20px;
-  background: rgba(146, 166, 176, 0.15);
+  background: #92a6b0;
   border-radius: 15px;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-}
-
-.grid.disabled {
-  opacity: 0.5;
-  pointer-events: none;
 }
 
 /* Emotion-specific button colors */
 .btn[onclick*="send(0)"] {
   background: linear-gradient(45deg, #9e9e9e, #757575);
 } /* Neutral - Gray */
-
 .btn[onclick*="send(1)"] {
   background: linear-gradient(45deg, #f44336, #d32f2f);
 } /* Angry - Red */
-
 .btn[onclick*="send(2)"] {
   background: linear-gradient(45deg, #ff9800, #f57c00);
 } /* Surprised - Orange */
-
 .btn[onclick*="send(3)"] {
   background: linear-gradient(45deg, #3f51b5, #303f9f);
 } /* Sad - Blue */
-
 .btn[onclick*="send(4)"] {
   background: linear-gradient(45deg, #795548, #5d4037);
 } /* Suspicious - Brown */
-
 .btn[onclick*="send(5)"],
 .btn[onclick*="send(6)"],
 .btn[onclick*="send(7)"],
 .btn[onclick*="send(8)"] {
-  background: linear-gradient(45deg, #607d8b, #455a64);
-} /* Directional - Blue Gray */
-
+  background: linear-gradient(
+    45deg,
+    #607d8b,
+    #455a64
+  ); /* Directional - Blue Gray */
+}
 .btn[onclick*="send(9)"] {
   background: linear-gradient(45deg, #9c27b0, #7b1fa2);
 } /* Sleepy - Purple */

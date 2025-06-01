@@ -1,3 +1,4 @@
+
 function send(state) {
   const buttons = document.querySelectorAll(".btn");
   const currentButton = event.target;
@@ -77,19 +78,13 @@ function toggleManual() {
       console.log("Manual mode response:", data);
 
       if (data.includes("ON")) {
-        // Manual mode is now ON
-        manualBtn.classList.remove("auto-mode");
-        manualBtn.classList.add("manual-mode");
         manualBtn.style.background = "linear-gradient(45deg, #ff5722, #d84315)";
-        manualBtn.innerHTML = "🔧 Manual Mode";
+        manualBtn.innerHTML = "Auto Mode";
         enableManualControls();
         showNotification("Manual mode enabled", "info");
       } else {
-        // Auto mode is now ON
-        manualBtn.classList.remove("manual-mode");
-        manualBtn.classList.add("auto-mode");
         manualBtn.style.background = "linear-gradient(45deg, #2196F3, #1976D2)";
-        manualBtn.innerHTML = "🤖 Auto Mode";
+        manualBtn.innerHTML = "Manual Mode";
         disableManualControls();
         showNotification("Auto mode enabled", "info");
       }
@@ -111,7 +106,6 @@ function enableManualControls() {
   emotionButtons.forEach((btn) => {
     btn.style.opacity = "1";
     btn.disabled = false;
-    btn.style.pointerEvents = "auto";
   });
 }
 
@@ -120,9 +114,8 @@ function disableManualControls() {
     '.btn:not(.manual):not([onclick*="light()"])'
   );
   emotionButtons.forEach((btn) => {
-    btn.style.opacity = "0.4";
-    btn.disabled = true;
-    btn.style.pointerEvents = "none";
+    btn.style.opacity = "0.6";
+    btn.disabled = false;
   });
 }
 
@@ -146,7 +139,6 @@ function showNotification(message, type = "info") {
     opacity: "0",
     transform: "translateX(100%)",
     transition: "all 0.3s ease",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
   });
 
   switch (type) {
@@ -230,36 +222,26 @@ document.addEventListener("DOMContentLoaded", function () {
   const body = document.body;
   const shortcutHint = document.createElement("div");
   shortcutHint.innerHTML =
-    "Keyboard shortcuts: 0-9 for emotions, L for light, M for manual/auto toggle";
+    "Keyboard shortcuts: 0-9 for emotions, L for light, M for manual mode";
   shortcutHint.style.cssText = `
         position: fixed;
         bottom: 10px;
         left: 50%;
         transform: translateX(-50%);
-        background: rgba(0,0,0,0.8);
+        background: rgba(0,0,0,0.7);
         color: white;
-        padding: 10px 18px;
-        border-radius: 25px;
-        font-size: 13px;
-        opacity: 0.8;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        opacity: 0.7;
         z-index: 100;
-        backdrop-filter: blur(5px);
-        border: 1px solid rgba(255,255,255,0.1);
     `;
   body.appendChild(shortcutHint);
 
   setTimeout(() => {
     shortcutHint.style.opacity = "0";
     setTimeout(() => shortcutHint.remove(), 1000);
-  }, 6000);
-
-  // Initialize manual button state
-  const manualBtn = document.getElementById("manualBtn");
-  if (manualBtn) {
-    manualBtn.classList.add("auto-mode");
-    manualBtn.innerHTML = "🤖 Auto Mode";
-    disableManualControls();
-  }
+  }, 5000);
 
   console.log("ESP32 Wearable Control Panel loaded successfully!");
 });
