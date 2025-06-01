@@ -3,14 +3,14 @@ body {
     margin: 0;
     padding: 20px;
     text-align: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #161616;
     min-height: 100vh;
     color: white;
 }
 
 h1 {
     color: #fff;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    /* text-shadow: 2px 2px 4px rgba(0,0,0,0.3); */
     font-size: 2.5em;
     margin-bottom: 30px;
 }
@@ -27,7 +27,6 @@ h1 {
     font-size: 16px;
     font-weight: 600;
     text-decoration: none;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -35,13 +34,11 @@ h1 {
 
 .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
     background: linear-gradient(45deg, #45a049, #4CAF50);
 }
 
 .btn:active {
     transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .manual {
@@ -60,12 +57,11 @@ h1 {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
     max-width: 600px;
-    margin: 20px auto;
+    margin: 0px auto;
     padding: 20px;
-    background: rgba(255,255,255,0.1);
+    background: #92A6B0;
     border-radius: 15px;
     backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
 }
 
 /* Emotion-specific button colors */
@@ -118,7 +114,7 @@ h1 {
 
 @media (max-width: 480px) {
     .grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .btn {
