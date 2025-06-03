@@ -70,20 +70,24 @@ h1 {
 
 /* Default colors - Auto icon active (blue), Manual icon inactive (gray) */
 .toggle-icon.auto img {
-  filter: brightness(0) saturate(100%) invert(42%) sepia(93%) saturate(1352%) hue-rotate(204deg) brightness(102%) contrast(101%);
+  filter: brightness(0) saturate(100%) invert(42%) sepia(93%) saturate(1352%)
+    hue-rotate(204deg) brightness(102%) contrast(101%);
 }
 
 .toggle-icon.manual img {
-  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%) hue-rotate(173deg) brightness(65%) contrast(87%);
+  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%)
+    hue-rotate(173deg) brightness(65%) contrast(87%);
 }
 
 /* When manual mode is active - Auto icon inactive (gray), Manual icon active (orange) */
 .toggle-container.manual-active .toggle-icon.auto img {
-  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%) hue-rotate(173deg) brightness(65%) contrast(87%);
+  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%)
+    hue-rotate(173deg) brightness(65%) contrast(87%);
 }
 
 .toggle-container.manual-active .toggle-icon.manual img {
-  filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(346deg) brightness(100%) contrast(97%);
+  filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%)
+    hue-rotate(346deg) brightness(100%) contrast(97%);
 }
 
 .toggle-switch {
@@ -283,5 +287,71 @@ h1 {
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+/* Add these styles to your CSS */
+.touchpad-container {
+  margin: 20px auto;
+  text-align: center;
+  max-width: 300px;
+}
+
+.touchpad {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  border: 3px solid #414141;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 70%,
+    transparent 100%
+  );
+  position: relative;
+  cursor: pointer;
+  touch-action: none;
+  transition: all 0.3s ease;
+}
+
+.touchpad:active {
+  border-color: #2196f3;
+  box-shadow: 0 0 20px rgba(33, 149, 243, 0.3);
+}
+
+.touchpad-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.touch-indicator {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #2196f3;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(33, 149, 243, 0.5);
+}
+
+.touch-indicator.active {
+  opacity: 1;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .touchpad {
+    width: 180px;
+    height: 180px;
   }
 }
