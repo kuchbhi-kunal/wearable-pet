@@ -1,6 +1,6 @@
 function send(state) {
-  const buttons = document.querySelectorAll(".btn");
-  const currentButton = event.target;
+  const buttons = document.querySelectorAll(".emotion-btn");
+  const currentButton = event.target.closest(".emotion-btn");
 
   currentButton.classList.add("loading");
   currentButton.disabled = true;
@@ -173,9 +173,7 @@ function setManualMode() {
 }
 
 function enableManualControls() {
-  const emotionButtons = document.querySelectorAll(
-    '.btn:not(.manual):not([onclick*="light()"])'
-  );
+  const emotionButtons = document.querySelectorAll(".emotion-btn");
   emotionButtons.forEach((btn) => {
     btn.style.opacity = "1";
     btn.disabled = false;
@@ -184,9 +182,7 @@ function enableManualControls() {
 }
 
 function disableManualControls() {
-  const emotionButtons = document.querySelectorAll(
-    '.btn:not(.manual):not([onclick*="light()"])'
-  );
+  const emotionButtons = document.querySelectorAll(".emotion-btn");
   emotionButtons.forEach((btn) => {
     btn.style.opacity = "0.4";
     btn.disabled = true;

@@ -45,6 +45,110 @@ h1 {
   opacity: 0.4;
 }
 
+/* New Emotion Button Styles */
+.emotion-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 20px 15px;
+  margin: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-height: 80px;
+  gap: 8px;
+}
+
+.emotion-btn img {
+  width: 32px;
+  height: 32px;
+  transition: all 0.3s ease;
+  /* SVGs are already grey, so no filter needed for inactive state */
+}
+
+.emotion-btn span {
+  font-size: 12px;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.emotion-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.emotion-btn:hover img {
+  /* Turn white on hover */
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%)
+    hue-rotate(93deg) brightness(103%) contrast(103%);
+}
+
+.emotion-btn:hover span {
+  opacity: 1;
+}
+
+.emotion-btn:active {
+  transform: translateY(0);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.emotion-btn:active img {
+  /* Stay white when active/clicked */
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%)
+    hue-rotate(93deg) brightness(103%) contrast(103%);
+}
+
+.emotion-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.emotion-btn.loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.emotion-btn.loading img {
+  opacity: 0.5;
+}
+
+.emotion-btn.loading:after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: #ffffff;
+  animation: spin 1s ease infinite;
+}
+
+/* Reading light button - keep original style but add light-btn class */
+.light-btn {
+  background: linear-gradient(45deg, #ffeb3b, #fbc02d);
+  color: #333;
+  grid-column: span 2; /* Make it span 2 columns */
+}
+
+.light-btn:hover {
+  background: linear-gradient(45deg, #fbc02d, #f9a825);
+}
+
 /* Toggle Switch Styles */
 .toggle-container {
   display: flex;
@@ -70,27 +174,30 @@ h1 {
 
 /* Default colors - Auto icon active (blue), Manual icon inactive (gray) */
 .toggle-icon.auto img {
-  filter: brightness(0) saturate(100%) invert(42%) sepia(93%) saturate(1352%) hue-rotate(204deg) brightness(102%) contrast(101%);
+  filter: brightness(0) saturate(100%) invert(42%) sepia(93%) saturate(1352%)
+    hue-rotate(204deg) brightness(102%) contrast(101%);
 }
 
 .toggle-icon.manual img {
-  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%) hue-rotate(173deg) brightness(65%) contrast(87%);
+  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%)
+    hue-rotate(173deg) brightness(65%) contrast(87%);
 }
 
 /* When manual mode is active - Auto icon inactive (gray), Manual icon active (orange) */
 .toggle-container.manual-active .toggle-icon.auto img {
-  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%) hue-rotate(173deg) brightness(65%) contrast(87%);
+  filter: brightness(0) saturate(100%) invert(53%) sepia(0%) saturate(0%)
+    hue-rotate(173deg) brightness(65%) contrast(87%);
 }
 
 .toggle-container.manual-active .toggle-icon.manual img {
-  filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(346deg) brightness(100%) contrast(97%);
+  filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%)
+    hue-rotate(346deg) brightness(100%) contrast(97%);
 }
 
 .toggle-switch {
   position: relative;
   width: 60px;
   height: 30px;
-  /* background: linear-gradient(45deg, #2196f3, #1976d2); */
   border-radius: 30px;
   border: 2px solid #414141;
   cursor: pointer;
@@ -120,13 +227,7 @@ h1 {
   transform: translateX(28px);
 }
 
-.toggle-switch input:checked ~ .toggle-switch {
-  background: linear-gradient(45deg, #ff5722, #d84315);
-  box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
-}
-
 .toggle-container.manual-active .toggle-switch {
-  /* background: linear-gradient(45deg, #ff5722, #d84315); */
   box-shadow: 0 4px 15px rgba(255, 86, 34, 0.197);
 }
 
@@ -151,9 +252,9 @@ h1 {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 15px;
-  max-width: 600px;
+  max-width: 700px;
   margin: 0px auto;
   padding: 20px;
   background: rgba(146, 166, 176, 0.15);
@@ -168,48 +269,6 @@ h1 {
   pointer-events: none;
 }
 
-/* Emotion-specific button colors */
-.btn[onclick*="send(0)"] {
-  background: linear-gradient(45deg, #9e9e9e, #757575);
-} /* Neutral - Gray */
-
-.btn[onclick*="send(1)"] {
-  background: linear-gradient(45deg, #f44336, #d32f2f);
-} /* Angry - Red */
-
-.btn[onclick*="send(2)"] {
-  background: linear-gradient(45deg, #ff9800, #f57c00);
-} /* Surprised - Orange */
-
-.btn[onclick*="send(3)"] {
-  background: linear-gradient(45deg, #3f51b5, #303f9f);
-} /* Sad - Blue */
-
-.btn[onclick*="send(4)"] {
-  background: linear-gradient(45deg, #795548, #5d4037);
-} /* Suspicious - Brown */
-
-.btn[onclick*="send(5)"],
-.btn[onclick*="send(6)"],
-.btn[onclick*="send(7)"],
-.btn[onclick*="send(8)"] {
-  background: linear-gradient(45deg, #607d8b, #455a64);
-} /* Directional - Blue Gray */
-
-.btn[onclick*="send(9)"] {
-  background: linear-gradient(45deg, #9c27b0, #7b1fa2);
-} /* Sleepy - Purple */
-
-/* Reading light button */
-.btn[onclick*="light()"] {
-  background: linear-gradient(45deg, #ffeb3b, #fbc02d);
-  color: #333;
-}
-
-.btn[onclick*="light()"]:hover {
-  background: linear-gradient(45deg, #fbc02d, #f9a825);
-}
-
 @media (max-width: 768px) {
   body {
     padding: 15px;
@@ -220,19 +279,29 @@ h1 {
   }
 
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     padding: 15px;
+    max-width: 100%;
   }
 
-  .btn {
-    padding: 12px 20px;
-    font-size: 14px;
+  .emotion-btn {
+    padding: 15px 10px;
+    min-height: 70px;
   }
 
-  .manual {
-    /* padding: 15px 25px; */
-    font-size: 16px;
+  .emotion-btn img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .emotion-btn span {
+    font-size: 11px;
+  }
+
+  .light-btn {
+    grid-column: span 3;
+    padding: 15px 25px;
   }
 
   .toggle-icon {
@@ -246,35 +315,28 @@ h1 {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .btn {
-    width: 100%;
-    margin: 5px 0;
+  .light-btn {
+    grid-column: span 2;
+  }
+
+  .emotion-btn {
+    padding: 12px 8px;
+    min-height: 65px;
+  }
+
+  .emotion-btn img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .emotion-btn span {
+    font-size: 10px;
   }
 
   .toggle-icon {
     width: 35px;
     height: 35px;
   }
-}
-
-.btn.loading {
-  position: relative;
-  color: transparent;
-}
-
-.btn.loading:after {
-  content: "";
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  top: 50%;
-  left: 50%;
-  margin-left: -8px;
-  margin-top: -8px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  border-top-color: #ffffff;
-  animation: spin 1s ease infinite;
 }
 
 @keyframes spin {
