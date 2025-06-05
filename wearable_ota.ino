@@ -387,7 +387,7 @@ void setupWebServer() {
   server.on("/manual", HTTP_GET, handleManualMode);
   server.begin();
   Serial.println("Web server started");
-  
+
 }
 
 // Web Server Route Handlers
@@ -396,12 +396,12 @@ void handleRoot() {
   html += "<meta charset='UTF-8'>";
   html += "<meta name='viewport' content='width=device-width, initial-scale=1.0'>";
   html += "<title>ESP32 Wearable Control Panel</title>";
-  
+
   // Link to external CSS hosted on GitHub via jsDelivr CDN
-  html += "<link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/wearable5.css'>";
-  
+  html += "<link rel='stylesheet' href='https://blinky.kuchbhikunal.com/wearable.css'>";
+
   html += "</head><body>";
-  
+
   // Hero image section
   html += "<div class='hero-image' style='width: 100%; margin-top: 3rem; margin-bottom: 3rem;'>";
   html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet/hero.svg' style='width: 100%;'>";
@@ -409,42 +409,87 @@ void handleRoot() {
 
   // Toggle switch with SVG icons
   html += "<div class='toggle-container' id='toggleContainer'>";
-  
+
   // Auto icon - using external SVG file
   html += "<div class='toggle-icon auto' onclick='setAutoMode()'>";
   html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/auto.svg' alt='Auto Mode'>";
   html += "</div>";
-  
+
   // Toggle switch
   html += "<label class='toggle-switch'>";
   html += "<input type='checkbox' id='modeToggle' onchange='toggleManual()'>";
   html += "<span class='slider'></span>";
   html += "</label>";
-  
+
   // Manual icon - using external SVG file
   html += "<div class='toggle-icon manual' onclick='setManualMode()'>";
   html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/manual.svg' alt='Manual Mode'>";
   html += "</div>";
-  
+
   html += "</div>";
 
+  // Updated grid with emotion icons
   html += "<div class='grid' id='emotionGrid'>";
-  html += "<button class='btn' onclick='send(0)'>Neutral</button>";
-  html += "<button class='btn' onclick='send(1)'>Angry</button>";
-  html += "<button class='btn' onclick='send(2)'>Surprised</button>";
-  html += "<button class='btn' onclick='send(3)'>Sad</button>";
-  html += "<button class='btn' onclick='send(4)'>Suspicious</button>";
-  html += "<button class='btn' onclick='send(5)'>Left</button>";
-  html += "<button class='btn' onclick='send(6)'>Right</button>";
-  html += "<button class='btn' onclick='send(7)'>Up</button>";
-  html += "<button class='btn' onclick='send(8)'>Down</button>";
-  html += "<button class='btn' onclick='send(9)'>Sleepy</button>";
-  html += "<button class='btn' onclick='light()' id='lightBtn'>Reading Light</button>";
+
+  // Emotion buttons with icons
+  html += "<button class='emotion-btn' data-state='0' onclick='send(0)'>";
+  html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/neutral.svg' alt='Neutral'>";
+  html += "<span>Neutral</span>";
+  html += "</button>";
+
+  html += "<button class='emotion-btn' data-state='1' onclick='send(1)'>";
+  html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/angry.svg' alt='Angry'>";
+  html += "<span>Angry</span>";
+  html += "</button>";
+
+  html += "<button class='emotion-btn' data-state='2' onclick='send(2)'>";
+  html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/surprised.svg' alt='Surprised'>";
+  html += "<span>Surprised</span>";
+  html += "</button>";
+
+  html += "<button class='emotion-btn' data-state='3' onclick='send(3)'>";
+  html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/sad.svg' alt='Sad'>";
+  html += "<span>Sad</span>";
+  html += "</button>";
+
+  html += "<button class='emotion-btn' data-state='4' onclick='send(4)'>";
+  html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/suspicious.svg' alt='Suspicious'>";
+  html += "<span>Suspicious</span>";
+  html += "</button>";
+
+  html += "<button class='emotion-btn' data-state='5' onclick='send(5)'>";
+  html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/left.svg' alt='Left'>";
+  html += "<span>Left</span>";
+  html += "</button>";
+
+  html += "<button class='emotion-btn' data-state='6' onclick='send(6)'>";
+  html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/right.svg' alt='Right'>";
+  html += "<span>Right</span>";
+  html += "</button>";
+
+  html += "<button class='emotion-btn' data-state='7' onclick='send(7)'>";
+  html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/up.svg' alt='Up'>";
+  html += "<span>Up</span>";
+  html += "</button>";
+
+  html += "<button class='emotion-btn' data-state='8' onclick='send(8)'>";
+  html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/down.svg' alt='Down'>";
+  html += "<span>Down</span>";
+  html += "</button>";
+
+  html += "<button class='emotion-btn' data-state='9' onclick='send(9)'>";
+  html += "<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/sleepy.svg' alt='Sleepy'>";
+  html += "<span>Sleepy</span>";
+  html += "</button>";
+
+  // Reading light button (keeping the original style)
+  html += "<button class='btn light-btn' onclick='light()' id='lightBtn'>Reading Light</button>";
+
   html += "</div>";
 
   // Link to external JavaScript hosted on GitHub via jsDelivr CDN
-  html += "<script src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/wearable4.js'></script>";
-  
+  html += "<script src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/wearable.js'></script>";
+
   html += "</body></html>";
 
   server.send(200, "text/html", html);
@@ -467,7 +512,7 @@ void handleEmotion() {
 
 void handleReadingLight() {
   readingLightOn = !readingLightOn; // Toggle the reading light
-  
+
   if (readingLightOn) {
     server.send(200, "text/plain", "Reading light ON");
   } else {
@@ -477,7 +522,7 @@ void handleReadingLight() {
 
 void handleManualMode() {
   manualMode = !manualMode; // Toggle manual mode
-  
+
   if (manualMode) {
     server.send(200, "text/plain", "Manual mode ON");
   } else {
