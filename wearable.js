@@ -1,3 +1,233 @@
+// wearable.js - External JavaScript file for ESP32 Wearable Pet
+
+// Google Fit Configuration
+const CLIENT_ID =
+  "354231827857-o0b9r3r1sjjqa48fuevnurj2j87669st.apps.googleusercontent.com";
+const DISCOVERY_DOC =
+  "https://www.googleapis.com/discovery/v1/apis/fitness/v1/rest";
+const SCOPES = "https://www.googleapis.com/auth/fitness.activity.read";
+
+let tokenClient;
+let isSignedIn = false;
+let isInitialized = false;
+
+// Google Fit Initialization
+async function initGoogleFit() {
+  document.getElementById("fitStatus").innerHTML = "Initializing...";
+  try {
+    await new Promise((resolve) => {
+      gapi.load("client", resolve);
+    });
+
+    await gapi.client.init({
+      discoveryDocs: [DISCOVERY_DOC],
+    });
+
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+      callback: (response) => {
+        if (response.error) {
+          document.getElementById("fitStatus").innerHTML =
+            "Error: " + response.error;
+          return;
+        }
+        isSignedIn = true;
+        document.getElementById("connectBtn").style.display = "none";
+        document.getElementById("getStepsBtn").style.display = "inline-block";
+        document.getElementById("fitStatus").innerHTML =
+          "Connected to Google Fit!";
+      },
+    });
+
+    isInitialized = true;
+    tokenClient.requestAccessToken();
+  } catch (error) {
+    document.getElementById("fitStatus").innerHTML = "Error: " + error.message;
+  }
+}
+
+// Fetch Steps from Google Fit
+async function fetchStepsFromGoogleFit() {
+  if (!isSignedIn) {
+    document.getElementById("fitStatus").innerHTML = "Please connect first";
+    return;
+  }
+
+  document.getElementById("fitStatus").innerHTML = "Fetching steps...";
+
+  try {
+    const now = new Date();
+    const startOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+    const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+
+    const request = {
+      aggregateBy: [
+        {
+          dataTypeName: "com.google.step_count.delta",
+          dataSourceId:
+            "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
+        },
+      ],
+      bucketByTime: { durationMillis: 86400000 },
+      startTimeMillis: startOfDay.getTime(),
+      endTimeMillis: endOfDay.getTime(),
+    };
+
+    const response = await gapi.client.fitness.users.dataset.aggregate({
+      userId: "me",
+      resource: request,
+    });
+
+    let totalSteps = 0;
+    if (response.result.bucket && response.result.bucket.length > 0) {
+      const bucket = response.result.bucket[0];
+      if (bucket.dataset && bucket.dataset.length > 0) {
+        const dataset = bucket.dataset[0];
+        if (dataset.point && dataset.point.length > 0) {
+          totalSteps = dataset.point.reduce((sum, point) => {
+            return sum + (point.value[0].intVal || 0);
+          }, 0);
+        }
+      }
+    }
+
+    // Send steps to ESP32
+    fetch("/steps", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ steps: totalSteps }),
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        document.getElementById("stepCount").textContent = totalSteps;
+        document.getElementById("fitStatus").innerHTML =
+          "Steps updated: " + totalSteps;
+        updatePetStatus();
+      })
+      .catch((error) => {
+        document.getElementById("fitStatus").innerHTML =
+          "Error sending steps: " + error.message;
+      });
+  } catch (error) {
+    document.getElementById("fitStatus").innerHTML =
+      "Error fetching steps: " + error.message;
+  }
+}
+
+// Pet Management Functions
+function buyFood() {
+  fetch("/buyfood")
+    .then((response) => response.text())
+    .then((data) => {
+      document.getElementById("fitStatus").innerHTML = data;
+      updatePetStatus();
+    })
+    .catch((error) => {
+      document.getElementById("fitStatus").innerHTML =
+        "Error buying food: " + error.message;
+    });
+}
+
+function feedPet() {
+  fetch("/feedpet")
+    .then((response) => response.text())
+    .then((data) => {
+      document.getElementById("fitStatus").innerHTML = data;
+      updatePetStatus();
+    })
+    .catch((error) => {
+      document.getElementById("fitStatus").innerHTML =
+        "Error feeding pet: " + error.message;
+    });
+}
+
+function updatePetStatus() {
+  fetch("/petstatus")
+    .then((response) => response.json())
+    .then((data) => {
+      document.getElementById("foodCount").textContent = data.food;
+      document.getElementById("happinessLevel").textContent = data.happiness;
+      document.getElementById("stepCount").textContent = data.steps;
+    })
+    .catch((error) => {
+      console.error("Error updating pet status:", error);
+    });
+}
+
+// Emotion and Control Functions
+function send(state) {
+  fetch("/emotion?state=" + state)
+    .then((response) => response.text())
+    .then((data) => {
+      console.log("Emotion set:", data);
+    })
+    .catch((error) => {
+      console.error("Error setting emotion:", error);
+    });
+}
+
+function light() {
+  fetch("/readinglight")
+    .then((response) => response.text())
+    .then((data) => {
+      console.log("Light toggled:", data);
+    })
+    .catch((error) => {
+      console.error("Error toggling light:", error);
+    });
+}
+
+function toggleManual() {
+  fetch("/manual")
+    .then((response) => response.text())
+    .then((data) => {
+      console.log("Manual mode toggled:", data);
+    })
+    .catch((error) => {
+      console.error("Error toggling manual mode:", error);
+    });
+}
+
+function setAutoMode() {
+  document.getElementById("modeToggle").checked = false;
+  fetch("/manual")
+    .then((response) => response.text())
+    .then((data) => {
+      console.log("Auto mode set:", data);
+    })
+    .catch((error) => {
+      console.error("Error setting auto mode:", error);
+    });
+}
+
+function setManualMode() {
+  document.getElementById("modeToggle").checked = true;
+  fetch("/manual")
+    .then((response) => response.text())
+    .then((data) => {
+      console.log("Manual mode set:", data);
+    })
+    .catch((error) => {
+      console.error("Error setting manual mode:", error);
+    });
+}
+
+// Initialize the application
+document.addEventListener("DOMContentLoaded", function () {
+  // Auto-update pet status every 30 seconds
+  setInterval(updatePetStatus, 30000);
+
+  // Initial load of pet status
+  updatePetStatus();
+
+  console.log("ESP32 Wearable Pet interface loaded");
+});
+
 function send(state) {
   const buttons = document.querySelectorAll(".emotion-btn");
   const currentButton = event.target.closest(".emotion-btn");
