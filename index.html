@@ -1,129 +1,116 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Virtual Pet Step Counter</title>
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			min-height: 100vh;
-			margin: 0;
-			background-color: #f0f0f0;
-		}
+	<meta charset='UTF-8'>
+	<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+	<title>Wearable Control Panel</title>
 
-		.button-container-feed {
-			display: flex;
-			flex-direction: column;
-			/* align-items: center; */
-			justify-content: center;
-			gap: 15px;
-			padding: 20px;
-			background-color: white;
-			border-radius: 12px;
-			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-			min-width: 300px;
-			max-width: 350px;
-		}
-
-		.steps-row {
-			display: flex;
-			align-items: center;
-			gap: 10px;
-			font-size: 18px;
-			color: #333;
-			font-weight: bold;
-		}
-
-		button {
-			padding: 12px 24px;
-			font-size: 16px;
-			background-color: #4285f4;
-			color: white;
-			border: none;
-			border-radius: 8px;
-			cursor: pointer;
-			transition: background-color 0.3s;
-		}
-
-		button:hover {
-			background-color: #3367d6;
-		}
-
-		#connectBtn {
-			background-color: #4285f4;
-		}
-
-		#convertBtn {
-			background-color: #ff6b35;
-			display: none;
-		}
-
-		#convertBtn:hover {
-			background-color: #e55a2b;
-		}
-
-		#totalStepsValue {
-			color: #4285f4;
-			font-weight: bold;
-			display: none;
-		}
-
-		#stepDisplay {
-			font-size: 20px;
-			font-weight: bold;
-			color: #333;
-			margin: 10px 0;
-			display: none;
-		}
-
-		#availableTreats {
-			font-size: 16px;
-			color: #666;
-			margin: 5px 0;
-			display: none;
-		}
-
-		#treatResult {
-			font-size: 28px;
-			font-weight: bold;
-			color: #ff6b35;
-			margin: 15px 0;
-			display: none;
-		}
-
-		#totalTreats {
-			font-size: 18px;
-			font-weight: bold;
-			color: #28a745;
-			margin: 10px 0;
-			display: none;
-		}
-	</style>
+	<!-- Link to external CSS hosted on GitHub via jsDelivr CDN -->
+	<link rel='stylesheet' href='wearable.css'>
 </head>
 
 <body>
-	<div class="button-container-feed">
-		<div class="steps-row">
-			<span>Steps today:</span>
-			<button id="connectBtn" onclick="connectToGoogleFit()">Connect Google Fit</button>
-			<span id="totalStepsValue"></span>
+
+	<!-- Hero image section -->
+	<div class='hero-image' style='width: 100%; margin-top: 3rem; margin-bottom: 3rem;'>
+		<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet/hero.svg' style='width: 100%;'>
+	</div>
+
+	<!-- Toggle switch with SVG icons -->
+	<div class='toggle-container' id='toggleContainer'>
+
+		<!-- Auto icon - using external SVG file -->
+		<div class='toggle-icon auto' onclick='setAutoMode()'>
+			<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/auto.svg' alt='Auto Mode'>
 		</div>
 
-		<div id="stepDisplay"></div>
-		<div id="availableTreats"></div>
-		<button id="convertBtn" onclick="convertToTreats()">Convert to Treats</button>
-		<div id="treatResult"></div>
-		<div id="totalTreats"></div>
+		<!-- Toggle switch -->
+		<label class='toggle-switch'>
+			<input type='checkbox' id='modeToggle' onchange='toggleManual()'>
+			<span class='slider'></span>
+		</label>
+
+		<!-- Manual icon - using external SVG file -->
+		<div class='toggle-icon manual' onclick='setManualMode()'>
+			<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/manual.svg' alt='Manual Mode'>
+		</div>
+
 	</div>
+
+	<button id="connectBtn" onclick="connectToGoogleFit()">Connect to Google Fit</button>
+	<div id="totalStepsDisplay"></div>
+	<div id="stepDisplay"></div>
+	<div id="availableTreats"></div>
+	<button id="convertBtn" onclick="convertToTreats()">Convert to Treats</button>
+	<div id="treatResult"></div>
+	<div id="totalTreats"></div>
+
+	<!-- Updated grid with emotion icons -->
+	<div class='grid' id='emotionGrid'>
+
+		<!-- Emotion buttons with icons -->
+		<button class='emotion-btn' data-state='0' onclick='send(0)'>
+			<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/neutral.svg' alt='Neutral'>
+			<span>Neutral</span>
+		</button>
+
+		<button class='emotion-btn' data-state='1' onclick='send(1)'>
+			<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/angry.svg' alt='Angry'>
+			<span>Angry</span>
+		</button>
+
+		<button class='emotion-btn' data-state='2' onclick='send(2)'>
+			<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/surprised.svg' alt='Surprised'>
+			<span>Surprised</span>
+		</button>
+
+		<button class='emotion-btn' data-state='3' onclick='send(3)'>
+			<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/sad.svg' alt='Sad'>
+			<span>Sad</span>
+		</button>
+
+		<button class='emotion-btn' data-state='4' onclick='send(4)'>
+			<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/suspicious.svg' alt='Suspicious'>
+			<span>Suspicious</span>
+		</button>
+
+		<button class='emotion-btn' data-state='5' onclick='send(5)'>
+			<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/left.svg' alt='Left'>
+			<span>Left</span>
+		</button>
+
+		<button class='emotion-btn' data-state='6' onclick='send(6)'>
+			<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/right.svg' alt='Right'>
+			<span>Right</span>
+		</button>
+
+		<button class='emotion-btn' data-state='7' onclick='send(7)'>
+			<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/up.svg' alt='Up'>
+			<span>Up</span>
+		</button>
+
+		<button class='emotion-btn' data-state='8' onclick='send(8)'>
+			<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/down.svg' alt='Down'>
+			<span>Down</span>
+		</button>
+
+		<button class='emotion-btn' data-state='9' onclick='send(9)'>
+			<img src='https://cdn.jsdelivr.net/gh/kuchbhi-kunal/wearable-pet@main/sleepy.svg' alt='Sleepy'>
+			<span>Sleepy</span>
+		</button>
+
+		<!-- Reading light button (keeping the original style) -->
+		<button class='btn light-btn' onclick='light()' id='lightBtn'>Reading Light</button>
+
+	</div>
+
+	<!-- Link to external JavaScript hosted on GitHub via jsDelivr CDN -->
+	<!-- <script src='wearable.js'></script> -->
 
 	<script src="https://apis.google.com/js/api.js"></script>
 	<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 	<script>
 		const CLIENT_ID = "354231827857-o0b9r3r1sjjqa48fuevnurj2j87669st.apps.googleusercontent.com";
 		const DISCOVERY_DOC = "https://www.googleapis.com/discovery/v1/apis/fitness/v1/rest";
@@ -134,23 +121,28 @@
 		let currentSteps = 0;
 		let availableTreats = 0;
 
-		const STEPS_PER_TREAT = 100;
+		// Configuration
+		const STEPS_PER_TREAT = 100; // Change this number to adjust steps needed per treat
 
+		// In-memory storage (replace with localStorage in your own environment)
 		let gameData = {
 			convertedSteps: 0,
 			totalTreats: 0,
 			lastUpdateDate: null
 		};
 
+		// Storage functions (replace these with localStorage in your own environment)
 		function saveGameData() {
+			// In a real environment, use:
 			localStorage.setItem( 'virtualPetData', JSON.stringify( gameData ) );
 			console.log( 'Game data saved:', gameData );
 		}
 
 		function loadGameData() {
+			// In a real environment, use:
 			const saved = localStorage.getItem( 'virtualPetData' );
 			if ( saved ) {
-			    gameData = JSON.parse( saved );
+				gameData = JSON.parse( saved );
 			}
 			console.log( 'Game data loaded:', gameData );
 		}
@@ -194,8 +186,9 @@
 
 				isInitialized = true;
 
+				// Show total treats if user has any
 				if ( gameData.totalTreats > 0 ) {
-					document.getElementById( "totalTreats" ).textContent = `Total Treats: ${gameData.totalTreats}`;
+					document.getElementById( "totalTreats" ).textContent = `🍖 Total Treats: ${gameData.totalTreats}`;
 					document.getElementById( "totalTreats" ).style.display = "block";
 				}
 
@@ -265,20 +258,20 @@
 					}
 				}
 
+				// Calculate available steps (total steps minus already converted steps)
 				const availableSteps = Math.max( 0, totalSteps - gameData.convertedSteps );
 				availableTreats = Math.floor( availableSteps / STEPS_PER_TREAT );
 
 				currentSteps = availableSteps;
 
-				document.getElementById( "connectBtn" ).style.display = "none";
-				document.getElementById( "totalStepsValue" ).textContent = totalSteps.toLocaleString();
-				document.getElementById( "totalStepsValue" ).style.display = "inline";
+				document.getElementById( "totalStepsDisplay" ).textContent = `Total steps today: ${totalSteps.toLocaleString()}`;
+				document.getElementById( "totalStepsDisplay" ).style.display = "block";
 
-				document.getElementById( "stepDisplay" ).textContent = `${availableSteps.toLocaleString()} Steps available to convert`;
+				document.getElementById( "stepDisplay" ).textContent = `${availableSteps.toLocaleString()} Steps available`;
 				document.getElementById( "stepDisplay" ).style.display = "block";
 
 				document.getElementById( "availableTreats" ).textContent = `${availableTreats} treats available`;
-				document.getElementById( "availableTreats" ).style.display = "none";
+				document.getElementById( "availableTreats" ).style.display = "block";
 
 				if ( availableTreats > 0 ) {
 					document.getElementById( "convertBtn" ).style.display = "inline-block";
@@ -286,8 +279,9 @@
 					document.getElementById( "convertBtn" ).style.display = "none";
 				}
 
+				// Update total treats display
 				if ( gameData.totalTreats > 0 ) {
-					document.getElementById( "totalTreats" ).textContent = `Total Treats: ${gameData.totalTreats}`;
+					document.getElementById( "totalTreats" ).textContent = `🍖 Total Treats: ${gameData.totalTreats}`;
 					document.getElementById( "totalTreats" ).style.display = "block";
 				}
 
@@ -302,23 +296,27 @@
 			const stepsToConvert = availableTreats * STEPS_PER_TREAT;
 			const remainingSteps = currentSteps - stepsToConvert;
 
+			// Update game data
 			gameData.convertedSteps += stepsToConvert;
 			gameData.totalTreats += availableTreats;
 			saveGameData();
 
-			document.getElementById( "stepDisplay" ).textContent = `${remainingSteps.toLocaleString()} Steps available to convert`;
+			// Update display
+			document.getElementById( "stepDisplay" ).textContent = `${remainingSteps.toLocaleString()} Steps available`;
 			document.getElementById( "availableTreats" ).textContent = `0 treats available`;
 			document.getElementById( "convertBtn" ).style.display = "none";
 
-			document.getElementById( "treatResult" ).textContent = `${availableTreats} Treat${availableTreats !== 1 ? 's' : ''} Bought!`;
+			document.getElementById( "treatResult" ).textContent = `🍖 +${availableTreats} Treat${availableTreats !== 1 ? 's' : ''} Earned!`;
 			document.getElementById( "treatResult" ).style.display = "block";
 
-			document.getElementById( "totalTreats" ).textContent = `Total Treats: ${gameData.totalTreats}`;
+			document.getElementById( "totalTreats" ).textContent = `🍖 Total Treats: ${gameData.totalTreats}`;
 			document.getElementById( "totalTreats" ).style.display = "block";
 
+			// Update current values
 			currentSteps = remainingSteps;
 			availableTreats = 0;
 
+			// Hide the result message after 3 seconds
 			setTimeout( () => {
 				document.getElementById( "treatResult" ).style.display = "none";
 			}, 3000 );
@@ -334,6 +332,7 @@
 			}, 100 );
 		};
 	</script>
+
 </body>
 
 </html>
