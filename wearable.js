@@ -329,7 +329,7 @@ document.addEventListener("DOMContentLoaded", function () {
   console.log("ESP32 Wearable Control Panel loaded successfully!");
 });
 
-// REPLACE WITH YOUR ACTUAL CLIENT ID
+// GOOGLE FIT
 const CLIENT_ID =
   "354231827857-o0b9r3r1sjjqa48fuevnurj2j87669st.apps.googleusercontent.com";
 const DISCOVERY_DOC =
