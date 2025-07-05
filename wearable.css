@@ -347,3 +347,91 @@ h1 {
     transform: rotate(360deg);
   }
 }
+
+.button-container-feed {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: center;
+  gap: 15px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-width: 300px;
+  max-width: 350px;
+}
+
+.steps-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  color: #333;
+  font-weight: bold;
+}
+
+button {
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #3367d6;
+}
+
+#connectBtn {
+  background-color: #4285f4;
+}
+
+#convertBtn {
+  background-color: #ff6b35;
+  display: none;
+}
+
+#convertBtn:hover {
+  background-color: #e55a2b;
+}
+
+#totalStepsValue {
+  color: #4285f4;
+  font-weight: bold;
+  display: none;
+}
+
+#stepDisplay {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin: 10px 0;
+  display: none;
+}
+
+#availableTreats {
+  font-size: 16px;
+  color: #666;
+  margin: 5px 0;
+  display: none;
+}
+
+#treatResult {
+  font-size: 28px;
+  font-weight: bold;
+  color: #ff6b35;
+  margin: 15px 0;
+  display: none;
+}
+
+#totalTreats {
+  font-size: 18px;
+  font-weight: bold;
+  color: #28a745;
+  margin: 10px 0;
+  display: none;
+}
