@@ -188,7 +188,7 @@ function updateTreatsDisplay() {
     totalTreatsElement.style.display = "block";
   } else {
     totalTreatsElement.innerHTML = `Total Treats: 0`;
-    totalTreatsElement.style.display = "block"; // Keep visible even if 0
+    totalTreatsElement.style.display = "flex"; // Keep visible even if 0
   }
   // Disable feed button if no treats
   const feedBtn = document.getElementById("feedBtn");

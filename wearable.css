@@ -433,6 +433,8 @@ button:hover {
   color: #fd5805;
   margin: 10px 0;
   display: none;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .feed-btn {
