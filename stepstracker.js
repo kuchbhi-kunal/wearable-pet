@@ -71,10 +71,16 @@ async function initializeGapi() {
     isInitialized = true;
 
     if (gameData.totalTreats > 0) {
-      document.getElementById(
-        "totalTreats"
-      ).textContent = `Total Treats: ${gameData.totalTreats}`;
-      document.getElementById("totalTreats").style.display = "block";
+      const totalTreatsElement = document.getElementById("totalTreats");
+      totalTreatsElement.innerHTML = `
+        Total Treats: ${gameData.totalTreats}
+        <button id="feedBtn" onclick="feedPet()" class="feed-btn" ${
+          gameData.totalTreats === 0 ? "disabled" : ""
+        }>
+          Feed Pet
+        </button>
+      `;
+      totalTreatsElement.style.display = "block";
     }
   } catch (error) {
     console.error("Error initializing:", error);
@@ -217,6 +223,25 @@ function convertToTreats() {
   setTimeout(() => {
     document.getElementById("treatResult").style.display = "none";
   }, 3000);
+}
+
+function updateTreatsAfterFeed() {
+  if (gameData.totalTreats > 0) {
+    gameData.totalTreats -= 1;
+    saveGameData();
+
+    const totalTreatsElement = document.getElementById("totalTreats");
+    if (gameData.totalTreats > 0) {
+      totalTreatsElement.innerHTML = `
+        Total Treats: ${gameData.totalTreats}
+        <button id="feedBtn" onclick="feedPet()" class="feed-btn">
+          Feed Pet
+        </button>
+      `;
+    } else {
+      totalTreatsElement.innerHTML = `Total Treats: 0`;
+    }
+  }
 }
 
 window.onload = function () {

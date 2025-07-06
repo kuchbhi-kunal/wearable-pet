@@ -245,6 +245,38 @@ function showNotification(message, type = "info") {
   }, 3000);
 }
 
+function feedPet() {
+  const feedBtn = document.getElementById("feedBtn");
+  feedBtn.classList.add("loading");
+  feedBtn.disabled = true;
+
+  fetch("/feed")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then((data) => {
+      console.log("Feed response:", data);
+
+      // Update treats count
+      if (typeof updateTreatsAfterFeed === "function") {
+        updateTreatsAfterFeed();
+      }
+
+      showNotification("Pet fed! Your pet is happy! 😊", "success");
+    })
+    .catch((error) => {
+      console.error("Error feeding pet:", error);
+      showNotification("Failed to feed pet", "error");
+    })
+    .finally(() => {
+      feedBtn.classList.remove("loading");
+      feedBtn.disabled = false;
+    });
+}
+
 document.addEventListener("keydown", function (event) {
   if (event.target.tagName !== "INPUT" && event.target.tagName !== "TEXTAREA") {
     switch (event.key) {

@@ -434,3 +434,34 @@ button:hover {
   margin: 10px 0;
   display: none;
 }
+
+.feed-btn {
+  background: linear-gradient(45deg, #4caf50, #45a049);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.feed-btn:hover {
+  background: linear-gradient(45deg, #45a049, #4caf50);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.feed-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.feed-btn.loading {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
