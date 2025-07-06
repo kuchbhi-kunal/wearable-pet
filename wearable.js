@@ -265,7 +265,7 @@ function feedPet() {
         updateTreatsAfterFeed();
       }
 
-      showNotification("Pet fed! Your pet is happy! 😊", "success");
+      showNotification("Pet fed!", "success");
     })
     .catch((error) => {
       console.error("Error feeding pet:", error);
