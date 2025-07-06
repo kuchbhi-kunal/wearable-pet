@@ -47,7 +47,14 @@ function updateDateIfNeeded() {
   }
 }
 
+// Initialize Google API client
 function initializeGapi() {
+  // Set initial status message for API loading
+  const statusElement = document.getElementById("status");
+  if (statusElement) {
+    statusElement.textContent = "Loading Google APIs...";
+  }
+
   gapi.client
     .init({
       discoveryDocs: [DISCOVERY_DOC],
@@ -55,7 +62,7 @@ function initializeGapi() {
       scope: SCOPES,
     })
     .then(() => {
-      isInitialized = true;
+      isInitialized = true; // Mark as initialized only after gapi.client.init succeeds
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
@@ -63,29 +70,41 @@ function initializeGapi() {
           if (tokenResponse && tokenResponse.access_token) {
             gapi.client.setToken(tokenResponse);
             console.log("Access token obtained:", tokenResponse.access_token);
-            // fetchFitnessData(); // Fetch data immediately after successful login
             checkLoginStatus(); // Update UI based on login status
           } else {
             console.log("Token response:", tokenResponse);
-            document.getElementById("status").textContent =
-              "Authentication failed.";
+            if (statusElement)
+              statusElement.textContent = "Authentication failed.";
           }
         },
         error_callback: (error) => {
           console.error("Token client error:", error);
-          document.getElementById("status").textContent =
-            "Authentication error: " + error.message;
+          if (statusElement)
+            statusElement.textContent =
+              "Authentication error: " + error.message;
         },
       });
       checkLoginStatus(); // Check and update button visibility on load
+      if (statusElement) statusElement.textContent = "Google APIs loaded."; // Final status after initialization
+    })
+    .catch((error) => {
+      console.error("Error initializing GAPI client:", error);
+      if (statusElement)
+        statusElement.textContent =
+          "Error loading Google APIs: " + error.message;
     });
 }
 
 function connectToGoogleFit() {
   if (!isInitialized) {
-    console.warn("GAPI not initialized yet.");
-    document.getElementById("status").textContent =
-      "Loading Google APIs, please wait...";
+    console.warn(
+      "GAPI not initialized yet. Please wait for page to load fully."
+    );
+    const statusElement = document.getElementById("status");
+    if (statusElement) {
+      statusElement.textContent =
+        "Google APIs are still loading. Please wait...";
+    }
     return;
   }
   tokenClient.requestAccessToken();
@@ -95,20 +114,27 @@ function checkLoginStatus() {
   const token = gapi.client.getToken();
   const connectBtn = document.getElementById("connectBtn");
   const totalStepsValue = document.getElementById("totalStepsValue");
+  const statusElement = document.getElementById("status");
 
   if (token && token.access_token) {
-    connectBtn.style.display = "none"; // Hide connect button
-    totalStepsValue.style.display = "inline"; // Show steps value
+    if (connectBtn) connectBtn.style.display = "none"; // Hide connect button
+    if (totalStepsValue) totalStepsValue.style.display = "inline"; // Show steps value
     fetchFitnessData(); // Fetch data if already logged in
+    if (statusElement) statusElement.textContent = "Connected to Google Fit.";
   } else {
-    connectBtn.style.display = "inline"; // Show connect button
-    totalStepsValue.style.display = "none"; // Hide steps value
-    totalStepsValue.textContent = "";
+    if (connectBtn) connectBtn.style.display = "inline"; // Show connect button
+    if (totalStepsValue) {
+      totalStepsValue.style.display = "none"; // Hide steps value
+      totalStepsValue.textContent = "";
+    }
+    if (statusElement)
+      statusElement.textContent = "Please connect to Google Fit.";
   }
 }
 
 async function fetchFitnessData() {
-  document.getElementById("status").textContent = "Fetching fitness data...";
+  const statusElement = document.getElementById("status");
+  if (statusElement) statusElement.textContent = "Fetching fitness data...";
   const today = new Date();
   today.setHours(0, 0, 0, 0); // Start of today
   const endOfDay = new Date();
@@ -159,31 +185,36 @@ async function fetchFitnessData() {
     currentSteps = totalSteps - gameData.convertedSteps;
     availableTreats = Math.floor(currentSteps / STEPS_PER_TREAT);
 
-    document.getElementById("totalStepsValue").textContent =
-      totalSteps.toLocaleString();
-    document.getElementById(
-      "stepDisplay"
-    ).textContent = `Available steps to convert: ${currentSteps.toLocaleString()}`;
-    document.getElementById(
-      "availableTreats"
-    ).textContent = `${availableTreats} treats available`;
+    if (document.getElementById("totalStepsValue"))
+      document.getElementById("totalStepsValue").textContent =
+        totalSteps.toLocaleString();
+    if (document.getElementById("stepDisplay"))
+      document.getElementById(
+        "stepDisplay"
+      ).textContent = `Available steps to convert: ${currentSteps.toLocaleString()}`;
+    if (document.getElementById("availableTreats"))
+      document.getElementById(
+        "availableTreats"
+      ).textContent = `${availableTreats} treats available`;
 
     const convertBtn = document.getElementById("convertBtn");
-    if (availableTreats > 0) {
-      convertBtn.style.display = "block";
-      convertBtn.disabled = false;
-    } else {
-      convertBtn.style.display = "none";
-      convertBtn.disabled = true;
+    if (convertBtn) {
+      if (availableTreats > 0) {
+        convertBtn.style.display = "block";
+        convertBtn.disabled = false;
+      } else {
+        convertBtn.style.display = "none";
+        convertBtn.disabled = true;
+      }
     }
 
     updateTreatsDisplay(); // Call this to ensure feed button is updated
 
-    document.getElementById("status").textContent = "Data loaded successfully!";
+    if (statusElement) statusElement.textContent = "Data loaded successfully!";
   } catch (error) {
     console.error("Error fetching fitness data:", error);
-    document.getElementById("status").textContent =
-      "Error fetching data: " + error.message;
+    if (statusElement)
+      statusElement.textContent = "Error fetching data: " + error.message;
   }
 }
 
@@ -200,29 +231,36 @@ function convertToTreats() {
   gameData.totalTreats += availableTreats;
   saveGameData();
 
-  document.getElementById(
-    "stepDisplay"
-  ).textContent = `Available steps to convert: ${remainingSteps.toLocaleString()} Steps available to convert`;
-  document.getElementById("availableTreats").textContent = `0 treats available`;
-  document.getElementById("convertBtn").style.display = "none";
+  if (document.getElementById("stepDisplay"))
+    document.getElementById(
+      "stepDisplay"
+    ).textContent = `Available steps to convert: ${remainingSteps.toLocaleString()} Steps available to convert`;
+  if (document.getElementById("availableTreats"))
+    document.getElementById(
+      "availableTreats"
+    ).textContent = `0 treats available`;
+  const convertBtn = document.getElementById("convertBtn");
+  if (convertBtn) convertBtn.style.display = "none";
 
-  document.getElementById(
-    "treatResult"
-  ).textContent = `${availableTreats} Treat${
-    availableTreats !== 1 ? "s" : ""
-  } Bought!`;
-  document.getElementById("treatResult").style.display = "block";
+  const treatResult = document.getElementById("treatResult");
+  if (treatResult) {
+    treatResult.textContent = `${availableTreats} Treat${
+      availableTreats !== 1 ? "s" : ""
+    } Bought!`;
+    treatResult.style.display = "block";
+  }
 
-  document.getElementById(
-    "totalTreats"
-  ).textContent = `Total Treats: ${gameData.totalTreats}`;
-  document.getElementById("totalTreats").style.display = "block";
+  const totalTreatsDisplay = document.getElementById("totalTreats");
+  if (totalTreatsDisplay) {
+    totalTreatsDisplay.textContent = `Total Treats: ${gameData.totalTreats}`;
+    totalTreatsDisplay.style.display = "block";
+  }
 
   currentSteps = remainingSteps;
   availableTreats = 0;
 
   setTimeout(() => {
-    document.getElementById("treatResult").style.display = "none";
+    if (treatResult) treatResult.style.display = "none";
   }, 3000);
 
   updateTreatsDisplay(); // Update feed button after conversion
@@ -230,15 +268,17 @@ function convertToTreats() {
 
 function updateTreatsDisplay() {
   const totalTreatsElement = document.getElementById("totalTreats");
-  if (gameData.totalTreats > 0) {
-    totalTreatsElement.innerHTML = `
-        Total Treats: ${gameData.totalTreats}
-        <button id="feedBtn" onclick="feedPet()" class="feed-btn">
-          Feed Pet
-        </button>
-      `;
-  } else {
-    totalTreatsElement.innerHTML = `Total Treats: 0`;
+  if (totalTreatsElement) {
+    if (gameData.totalTreats > 0) {
+      totalTreatsElement.innerHTML = `
+          Total Treats: ${gameData.totalTreats}
+          <button id="feedBtn" onclick="feedPet()" class="feed-btn">
+            Feed Pet
+          </button>
+        `;
+    } else {
+      totalTreatsElement.innerHTML = `Total Treats: 0`;
+    }
   }
 }
 
@@ -280,7 +320,7 @@ async function feedPet() {
   }
 }
 
-// --- New: Fetch Hunger Level Function ---
+// --- Fetch Hunger Level Function ---
 async function fetchHungerLevel() {
   try {
     const response = await fetch("/hunger");
@@ -320,7 +360,7 @@ async function fetchHungerLevel() {
         if (state === 3) {
           // Sad state
           button.disabled = false; // Always allow sad state
-          button.title = "Pet is critically hungry, can only be sad.";
+          button.title = "Pet is critically hungry, can only show sad state.";
         } else {
           button.disabled = true;
           button.title =
@@ -357,19 +397,13 @@ window.onload = function () {
   updateDateIfNeeded();
   updateTreatsDisplay(); // Ensure feed button is set up correctly on load
 
-  setTimeout(() => {
-    if (
-      typeof gapi !== "undefined" &&
-      typeof google !== "undefined" &&
-      google.accounts
-    ) {
-      initializeGapi();
-    } else {
-      document.getElementById("status").textContent = "Loading Google APIs...";
-    }
-  }, 500); // Small delay to ensure Google APIs are loaded
+  // Load the 'client' library for gapi, then call initializeGapi
+  // This ensures gapi.client is available before initializeGapi is called.
+  // The 'status' div text content updates are now handled within initializeGapi
+  gapi.load("client", initializeGapi);
 
   // Initial fetch of hunger level and then set up interval
+  // These do not depend on gapi, so they can be called directly
   fetchHungerLevel();
-  setInterval(fetchHungerLevel, 5000); // Fetch hunger level every 5 seconds
+  setInterval(fetchHungerLevel, 5000);
 };
