@@ -439,16 +439,17 @@ button:hover {
 
 .feed-btn {
   background: linear-gradient(45deg, #4caf50, #45a049);
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 16px;
   cursor: pointer;
   margin-left: 10px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: rgb(255, 212, 18);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .feed-btn:hover {
@@ -467,4 +468,3 @@ button:hover {
   opacity: 0.6;
   cursor: not-allowed;
 }
-
