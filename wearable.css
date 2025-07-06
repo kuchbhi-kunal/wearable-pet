@@ -467,3 +467,62 @@ button:hover {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* Hunger Bar Styles */
+.hunger-bar-container {
+    width: 80%;
+    margin: 20px auto;
+    text-align: center;
+    font-size: 1.1em;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.hunger-bar-bg {
+    width: 100%;
+    height: 25px; /* Thicker bar */
+    background-color: #e0e0e0;
+    border-radius: 12px; /* More rounded corners */
+    overflow: hidden;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+    border: 1px solid #ccc; /* Subtle border */
+}
+
+.hunger-bar-fill {
+    height: 100%;
+    width: 100%; /* Initial width */
+    background: linear-gradient(to right, #4CAF50, #8BC34A); /* Green gradient for healthy */
+    border-radius: 12px;
+    transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out; /* Smooth transitions */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white; /* Text color for the fill */
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.hunger-bar-fill.warning {
+    background: linear-gradient(to right, #FFC107, #FF9800); /* Orange gradient for warning */
+}
+
+.hunger-bar-fill.critical {
+    background: linear-gradient(to right, #F44336, #D32F2F); /* Red gradient for critical */
+}
+
+/* Styles for disabled buttons when pet is hungry */
+.emotion-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #ccc;
+    box-shadow: none;
+    transform: none;
+}
+
+.emotion-btn:disabled:hover {
+    box-shadow: none;
+    transform: none;
+}
