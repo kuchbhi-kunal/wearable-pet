@@ -329,195 +329,195 @@ document.addEventListener("DOMContentLoaded", function () {
   console.log("ESP32 Wearable Control Panel loaded successfully!");
 });
 
-// GOOGLE FIT
-const CLIENT_ID =
-  "354231827857-o0b9r3r1sjjqa48fuevnurj2j87669st.apps.googleusercontent.com";
-const DISCOVERY_DOC =
-  "https://www.googleapis.com/discovery/v1/apis/fitness/v1/rest";
-const SCOPES =
-  "https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/fitness.body.read https://www.googleapis.com/auth/fitness.location.read";
+// // GOOGLE FIT
+// const CLIENT_ID =
+//   "354231827857-o0b9r3r1sjjqa48fuevnurj2j87669st.apps.googleusercontent.com";
+// const DISCOVERY_DOC =
+//   "https://www.googleapis.com/discovery/v1/apis/fitness/v1/rest";
+// const SCOPES =
+//   "https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/fitness.body.read https://www.googleapis.com/auth/fitness.location.read";
 
-let tokenClient;
-let isInitialized = false;
+// let tokenClient;
+// let isInitialized = false;
 
-async function initializeGapi() {
-  try {
-    document.getElementById("status").textContent = "Initializing...";
+// async function initializeGapi() {
+//   try {
+//     document.getElementById("status").textContent = "Initializing...";
 
-    await new Promise((resolve) => {
-      gapi.load("client", resolve);
-    });
+//     await new Promise((resolve) => {
+//       gapi.load("client", resolve);
+//     });
 
-    await gapi.client.init({
-      discoveryDocs: [DISCOVERY_DOC],
-    });
+//     await gapi.client.init({
+//       discoveryDocs: [DISCOVERY_DOC],
+//     });
 
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: SCOPES,
-      callback: async (response) => {
-        if (response.error) {
-          document.getElementById("status").textContent =
-            "Error: " + response.error;
-          return;
-        }
-        document.getElementById("status").textContent =
-          "Connected! Fetching data...";
-        await fetchData();
-      },
-    });
+//     tokenClient = google.accounts.oauth2.initTokenClient({
+//       client_id: CLIENT_ID,
+//       scope: SCOPES,
+//       callback: async (response) => {
+//         if (response.error) {
+//           document.getElementById("status").textContent =
+//             "Error: " + response.error;
+//           return;
+//         }
+//         document.getElementById("status").textContent =
+//           "Connected! Fetching data...";
+//         await fetchData();
+//       },
+//     });
 
-    isInitialized = true;
-    document.getElementById("status").textContent = "Ready to connect";
-  } catch (error) {
-    document.getElementById("status").textContent =
-      "Error initializing: " + error.message;
-  }
-}
+//     isInitialized = true;
+//     document.getElementById("status").textContent = "Ready to connect";
+//   } catch (error) {
+//     document.getElementById("status").textContent =
+//       "Error initializing: " + error.message;
+//   }
+// }
 
-function connectToGoogleFit() {
-  if (!isInitialized) {
-    document.getElementById("status").textContent =
-      "Please wait, still loading...";
-    return;
-  }
-  document.getElementById("status").textContent = "Connecting...";
-  tokenClient.requestAccessToken();
-}
+// function connectToGoogleFit() {
+//   if (!isInitialized) {
+//     document.getElementById("status").textContent =
+//       "Please wait, still loading...";
+//     return;
+//   }
+//   document.getElementById("status").textContent = "Connecting...";
+//   tokenClient.requestAccessToken();
+// }
 
-async function fetchData() {
-  try {
-    const now = new Date();
-    const startOfDay = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate()
-    );
-    const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+// async function fetchData() {
+//   try {
+//     const now = new Date();
+//     const startOfDay = new Date(
+//       now.getFullYear(),
+//       now.getMonth(),
+//       now.getDate()
+//     );
+//     const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
 
-    let totalSteps = 0;
-    let totalDistance = 0;
+//     let totalSteps = 0;
+//     let totalDistance = 0;
 
-    // Fetch Steps
-    const stepDataSources = [
-      "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
-      "derived:com.google.step_count.delta:com.google.android.gms:merge_step_deltas",
-    ];
+//     // Fetch Steps
+//     const stepDataSources = [
+//       "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
+//       "derived:com.google.step_count.delta:com.google.android.gms:merge_step_deltas",
+//     ];
 
-    for (const dataSource of stepDataSources) {
-      try {
-        const request = {
-          aggregateBy: [
-            {
-              dataTypeName: "com.google.step_count.delta",
-              dataSourceId: dataSource,
-            },
-          ],
-          bucketByTime: { durationMillis: 86400000 },
-          startTimeMillis: startOfDay.getTime(),
-          endTimeMillis: endOfDay.getTime(),
-        };
+//     for (const dataSource of stepDataSources) {
+//       try {
+//         const request = {
+//           aggregateBy: [
+//             {
+//               dataTypeName: "com.google.step_count.delta",
+//               dataSourceId: dataSource,
+//             },
+//           ],
+//           bucketByTime: { durationMillis: 86400000 },
+//           startTimeMillis: startOfDay.getTime(),
+//           endTimeMillis: endOfDay.getTime(),
+//         };
 
-        const response = await gapi.client.fitness.users.dataset.aggregate({
-          userId: "me",
-          resource: request,
-        });
+//         const response = await gapi.client.fitness.users.dataset.aggregate({
+//           userId: "me",
+//           resource: request,
+//         });
 
-        if (response.result.bucket && response.result.bucket.length > 0) {
-          const bucket = response.result.bucket[0];
-          if (bucket.dataset && bucket.dataset.length > 0) {
-            const dataset = bucket.dataset[0];
-            if (dataset.point && dataset.point.length > 0) {
-              const steps = dataset.point.reduce((sum, point) => {
-                return sum + (point.value[0].intVal || 0);
-              }, 0);
-              if (steps > 0) {
-                totalSteps = Math.max(totalSteps, steps);
-                break;
-              }
-            }
-          }
-        }
-      } catch (error) {
-        console.log("Step source failed:", error);
-      }
-    }
+//         if (response.result.bucket && response.result.bucket.length > 0) {
+//           const bucket = response.result.bucket[0];
+//           if (bucket.dataset && bucket.dataset.length > 0) {
+//             const dataset = bucket.dataset[0];
+//             if (dataset.point && dataset.point.length > 0) {
+//               const steps = dataset.point.reduce((sum, point) => {
+//                 return sum + (point.value[0].intVal || 0);
+//               }, 0);
+//               if (steps > 0) {
+//                 totalSteps = Math.max(totalSteps, steps);
+//                 break;
+//               }
+//             }
+//           }
+//         }
+//       } catch (error) {
+//         console.log("Step source failed:", error);
+//       }
+//     }
 
-    // Fetch Distance
-    const distanceDataSources = [
-      "derived:com.google.distance.delta:com.google.android.gms:merge_distance_delta",
-      "derived:com.google.distance.delta:com.google.android.gms:estimated_distance_delta",
-    ];
+//     // Fetch Distance
+//     const distanceDataSources = [
+//       "derived:com.google.distance.delta:com.google.android.gms:merge_distance_delta",
+//       "derived:com.google.distance.delta:com.google.android.gms:estimated_distance_delta",
+//     ];
 
-    for (const dataSource of distanceDataSources) {
-      try {
-        const request = {
-          aggregateBy: [
-            {
-              dataTypeName: "com.google.distance.delta",
-              dataSourceId: dataSource,
-            },
-          ],
-          bucketByTime: { durationMillis: 86400000 },
-          startTimeMillis: startOfDay.getTime(),
-          endTimeMillis: endOfDay.getTime(),
-        };
+//     for (const dataSource of distanceDataSources) {
+//       try {
+//         const request = {
+//           aggregateBy: [
+//             {
+//               dataTypeName: "com.google.distance.delta",
+//               dataSourceId: dataSource,
+//             },
+//           ],
+//           bucketByTime: { durationMillis: 86400000 },
+//           startTimeMillis: startOfDay.getTime(),
+//           endTimeMillis: endOfDay.getTime(),
+//         };
 
-        const response = await gapi.client.fitness.users.dataset.aggregate({
-          userId: "me",
-          resource: request,
-        });
+//         const response = await gapi.client.fitness.users.dataset.aggregate({
+//           userId: "me",
+//           resource: request,
+//         });
 
-        if (response.result.bucket && response.result.bucket.length > 0) {
-          const bucket = response.result.bucket[0];
-          if (bucket.dataset && bucket.dataset.length > 0) {
-            const dataset = bucket.dataset[0];
-            if (dataset.point && dataset.point.length > 0) {
-              const distance = dataset.point.reduce((sum, point) => {
-                return sum + (point.value[0].fpVal || 0);
-              }, 0);
-              if (distance > 0) {
-                totalDistance = Math.max(totalDistance, distance);
-                break;
-              }
-            }
-          }
-        }
-      } catch (error) {
-        console.log("Distance source failed:", error);
-      }
-    }
+//         if (response.result.bucket && response.result.bucket.length > 0) {
+//           const bucket = response.result.bucket[0];
+//           if (bucket.dataset && bucket.dataset.length > 0) {
+//             const dataset = bucket.dataset[0];
+//             if (dataset.point && dataset.point.length > 0) {
+//               const distance = dataset.point.reduce((sum, point) => {
+//                 return sum + (point.value[0].fpVal || 0);
+//               }, 0);
+//               if (distance > 0) {
+//                 totalDistance = Math.max(totalDistance, distance);
+//                 break;
+//               }
+//             }
+//           }
+//         }
+//       } catch (error) {
+//         console.log("Distance source failed:", error);
+//       }
+//     }
 
-    // Display results
-    document.getElementById("steps").textContent = totalSteps.toLocaleString();
+//     // Display results
+//     document.getElementById("steps").textContent = totalSteps.toLocaleString();
 
-    let distanceText;
-    if (totalDistance >= 1000) {
-      distanceText = (totalDistance / 1000).toFixed(2) + " km";
-    } else {
-      distanceText = Math.round(totalDistance) + " meters";
-    }
-    document.getElementById("distance").textContent = distanceText;
+//     let distanceText;
+//     if (totalDistance >= 1000) {
+//       distanceText = (totalDistance / 1000).toFixed(2) + " km";
+//     } else {
+//       distanceText = Math.round(totalDistance) + " meters";
+//     }
+//     document.getElementById("distance").textContent = distanceText;
 
-    document.getElementById("data").style.display = "block";
-    document.getElementById("status").textContent = "Data loaded successfully!";
-  } catch (error) {
-    document.getElementById("status").textContent =
-      "Error fetching data: " + error.message;
-  }
-}
+//     document.getElementById("data").style.display = "block";
+//     document.getElementById("status").textContent = "Data loaded successfully!";
+//   } catch (error) {
+//     document.getElementById("status").textContent =
+//       "Error fetching data: " + error.message;
+//   }
+// }
 
-window.onload = function () {
-  setTimeout(() => {
-    if (
-      typeof gapi !== "undefined" &&
-      typeof google !== "undefined" &&
-      google.accounts
-    ) {
-      initializeGapi();
-    } else {
-      document.getElementById("status").textContent = "Loading Google APIs...";
-      setTimeout(arguments.callee, 500);
-    }
-  }, 100);
-};
+// window.onload = function () {
+//   setTimeout(() => {
+//     if (
+//       typeof gapi !== "undefined" &&
+//       typeof google !== "undefined" &&
+//       google.accounts
+//     ) {
+//       initializeGapi();
+//     } else {
+//       document.getElementById("status").textContent = "Loading Google APIs...";
+//       setTimeout(arguments.callee, 500);
+//     }
+//   }, 100);
+// };
