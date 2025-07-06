@@ -370,8 +370,7 @@ h1 {
   justify-content: space-between;
   gap: 10px;
   font-size: 18px;
-  color: #333;
-  font-weight: bold;
+  color: #fff;
 }
 
 button {
@@ -410,8 +409,7 @@ button:hover {
 
 #stepDisplay {
   font-size: 20px;
-  font-weight: bold;
-  color: #333;
+  color: #fff;
   margin: 10px 0;
   display: none;
 }
@@ -425,16 +423,14 @@ button:hover {
 
 #treatResult {
   font-size: 28px;
-  font-weight: bold;
-  color: #ff6b35;
+  color: #f1e904;
   margin: 15px 0;
   display: none;
 }
 
 #totalTreats {
   font-size: 18px;
-  font-weight: bold;
-  color: #28a745;
+  color: #fd5805;
   margin: 10px 0;
   display: none;
 }
