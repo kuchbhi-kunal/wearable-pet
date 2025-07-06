@@ -48,7 +48,8 @@ function updateDateIfNeeded() {
 }
 
 // This function now primarily initializes the Google Identity Services (GIS) tokenClient
-function initializeGapi() {
+function initializeGisClient() {
+  // Renamed for clarity
   const statusElement = document.getElementById("status");
   if (statusElement) {
     statusElement.textContent = "Initializing Google services...";
@@ -115,6 +116,18 @@ function connectToGoogleFit() {
 }
 
 function checkLoginStatus() {
+  // Ensure gapi.client and gapi.client.fitness are loaded before attempting to get token or fetch data
+  if (!gapi.client || !gapi.client.fitness) {
+    console.warn(
+      "Google APIs (gapi.client or gapi.client.fitness) not fully loaded yet."
+    );
+    const statusElement = document.getElementById("status");
+    if (statusElement)
+      statusElement.textContent = "Google Fitness API is still loading...";
+    // You might want to delay checkLoginStatus until both are guaranteed to be loaded
+    return;
+  }
+
   const token = gapi.client.getToken(); // Get the current token from gapi.client (if set)
   const connectBtn = document.getElementById("connectBtn");
   const totalStepsValue = document.getElementById("totalStepsValue");
@@ -137,6 +150,17 @@ function checkLoginStatus() {
 }
 
 async function fetchFitnessData() {
+  // Ensure gapi.client.fitness is available before making API call
+  if (!gapi.client || !gapi.client.fitness) {
+    console.error(
+      "Attempted to fetch fitness data before gapi.client.fitness was loaded."
+    );
+    const statusElement = document.getElementById("status");
+    if (statusElement)
+      statusElement.textContent = "Error: Fitness API not ready.";
+    return;
+  }
+
   const statusElement = document.getElementById("status");
   if (statusElement) statusElement.textContent = "Fetching fitness data...";
   const today = new Date();
@@ -150,7 +174,7 @@ async function fetchFitnessData() {
   let totalSteps = 0;
 
   try {
-    // Fetch steps using gapi.client (which should have a token now)
+    // Fetch steps using gapi.client.fitness (which should have a token now)
     const stepsResponse =
       await gapi.client.fitness.users.dataset.aggregate.post({
         userId: "me",
@@ -401,25 +425,38 @@ window.onload = function () {
   updateDateIfNeeded();
   updateTreatsDisplay(); // Ensure feed button is set up correctly on load
 
-  // Load gapi client for API calls first.
-  // The callback will then initialize the GIS token client once gapi.client is ready.
+  // Load gapi client library (gapi.client) first.
   gapi.load("client", () => {
-    // Also ensure google.accounts.oauth2 is available from gsi/client.js
-    if (
-      typeof google !== "undefined" &&
-      google.accounts &&
-      google.accounts.oauth2
-    ) {
-      initializeGapi(); // Call the GIS token client initialization
-    } else {
-      const statusElement = document.getElementById("status");
-      if (statusElement)
-        statusElement.textContent =
-          "Error: Google Identity Services library not loaded.";
-      console.error(
-        "Google Identity Services (google.accounts.oauth2) not available. Check gsi/client.js script loading."
-      );
-    }
+    // Once gapi.client is loaded, then load the specific Fitness API.
+    gapi.client
+      .load("fitness", "v1")
+      .then(() => {
+        // After both gapi.client and gapi.client.fitness are loaded,
+        // then initialize Google Identity Services (GIS) token client.
+        // This also ensures 'google.accounts.oauth2' from gsi/client.js is ready.
+        if (
+          typeof google !== "undefined" &&
+          google.accounts &&
+          google.accounts.oauth2
+        ) {
+          initializeGisClient(); // Call the GIS token client initialization
+        } else {
+          const statusElement = document.getElementById("status");
+          if (statusElement)
+            statusElement.textContent =
+              "Error: Google Identity Services library not loaded.";
+          console.error(
+            "Google Identity Services (google.accounts.oauth2) not available. Check gsi/client.js script loading."
+          );
+        }
+      })
+      .catch((error) => {
+        const statusElement = document.getElementById("status");
+        if (statusElement)
+          statusElement.textContent =
+            "Error loading Fitness API: " + error.message;
+        console.error("Error loading Google Fitness API:", error);
+      });
   });
 
   // Initial fetch of hunger level and then set up interval
