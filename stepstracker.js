@@ -10,7 +10,7 @@ let isInitialized = false;
 let currentSteps = 0;
 let availableTreats = 0;
 
-const STEPS_PER_TREAT = 100;
+const STEPS_PER_TREAT = 500;
 
 let gameData = {
   convertedSteps: 0,
