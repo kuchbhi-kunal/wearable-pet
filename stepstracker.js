@@ -185,7 +185,7 @@ function updateTreatsDisplay() {
         Feed Pet
       </button>
     `;
-    totalTreatsElement.style.display = "block";
+    totalTreatsElement.style.display = "flex";
   } else {
     totalTreatsElement.innerHTML = `Total Treats: 0`;
     totalTreatsElement.style.display = "flex"; // Keep visible even if 0
