@@ -70,18 +70,8 @@ async function initializeGapi() {
 
     isInitialized = true;
 
-    if (gameData.totalTreats > 0) {
-      const totalTreatsElement = document.getElementById("totalTreats");
-      totalTreatsElement.innerHTML = `
-        Total Treats: ${gameData.totalTreats}
-        <button id="feedBtn" onclick="feedPet()" class="feed-btn" ${
-          gameData.totalTreats === 0 ? "disabled" : ""
-        }>
-          Feed Pet
-        </button>
-      `;
-      totalTreatsElement.style.display = "block";
-    }
+    // Call updateTreatsDisplay here to ensure button is shown on initial load if treats exist
+    updateTreatsDisplay();
   } catch (error) {
     console.error("Error initializing:", error);
   }
@@ -178,14 +168,32 @@ async function fetchData() {
       document.getElementById("convertBtn").style.display = "none";
     }
 
-    if (gameData.totalTreats > 0) {
-      document.getElementById(
-        "totalTreats"
-      ).textContent = `Total Treats: ${gameData.totalTreats}`;
-      document.getElementById("totalTreats").style.display = "block";
-    }
+    // Call updateTreatsDisplay here after fetching data to ensure consistency
+    updateTreatsDisplay();
   } catch (error) {
     console.error("Error fetching data:", error);
+  }
+}
+
+// New helper function to update the treats display and button
+function updateTreatsDisplay() {
+  const totalTreatsElement = document.getElementById("totalTreats");
+  if (gameData.totalTreats > 0) {
+    totalTreatsElement.innerHTML = `
+      Total Treats: ${gameData.totalTreats}
+      <button id="feedBtn" onclick="feedPet()" class="feed-btn">
+        Feed Pet
+      </button>
+    `;
+    totalTreatsElement.style.display = "block";
+  } else {
+    totalTreatsElement.innerHTML = `Total Treats: 0`;
+    totalTreatsElement.style.display = "block"; // Keep visible even if 0
+  }
+  // Disable feed button if no treats
+  const feedBtn = document.getElementById("feedBtn");
+  if (feedBtn) {
+    feedBtn.disabled = gameData.totalTreats === 0;
   }
 }
 
@@ -212,10 +220,8 @@ function convertToTreats() {
   } Bought!`;
   document.getElementById("treatResult").style.display = "block";
 
-  document.getElementById(
-    "totalTreats"
-  ).textContent = `Total Treats: ${gameData.totalTreats}`;
-  document.getElementById("totalTreats").style.display = "block";
+  // Update treats display and button after conversion
+  updateTreatsDisplay();
 
   currentSteps = remainingSteps;
   availableTreats = 0;
@@ -229,19 +235,9 @@ function updateTreatsAfterFeed() {
   if (gameData.totalTreats > 0) {
     gameData.totalTreats -= 1;
     saveGameData();
-
-    const totalTreatsElement = document.getElementById("totalTreats");
-    if (gameData.totalTreats > 0) {
-      totalTreatsElement.innerHTML = `
-        Total Treats: ${gameData.totalTreats}
-        <button id="feedBtn" onclick="feedPet()" class="feed-btn">
-          Feed Pet
-        </button>
-      `;
-    } else {
-      totalTreatsElement.innerHTML = `Total Treats: 0`;
-    }
   }
+  // Always update display after feeding, even if it goes to 0
+  updateTreatsDisplay();
 }
 
 window.onload = function () {
