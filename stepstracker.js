@@ -174,25 +174,22 @@ async function fetchFitnessData() {
   let totalSteps = 0;
 
   try {
-    // Fetch steps using gapi.client.fitness (which should have a token now)
-    const stepsResponse =
-      await gapi.client.fitness.users.dataset.aggregate.post({
-        userId: "me",
-        resource: {
-          aggregateBy: [
-            {
-              dataTypeName: "com.google.step_count.delta",
-              dataSourceId:
-                "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
-            },
-          ],
-          bucketByTime: {
-            period: "day",
-          },
-          startTimeMillis: startTimeMillis,
-          endTimeMillis: endTimeMillis,
+    // CORRECTED: Call aggregate directly with the request body, no .post() needed, and removed 'resource' wrapper
+    const stepsResponse = await gapi.client.fitness.users.dataset.aggregate({
+      userId: "me",
+      aggregateBy: [
+        {
+          dataTypeName: "com.google.step_count.delta",
+          dataSourceId:
+            "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
         },
-      });
+      ],
+      bucketByTime: {
+        period: "day",
+      },
+      startTimeMillis: startTimeMillis,
+      endTimeMillis: endTimeMillis,
+    });
 
     if (stepsResponse.result && stepsResponse.result.bucket) {
       stepsResponse.result.bucket.forEach((bucket) => {
