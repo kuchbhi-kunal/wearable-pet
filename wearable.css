@@ -352,12 +352,14 @@ h1 {
   display: flex;
   flex-direction: column;
   /* align-items: center; */
+  margin-bottom: 2rem;
   justify-content: center;
   gap: 15px;
-  padding: 20px;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  background: rgba(146, 166, 176, 0.15);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   min-width: 300px;
   max-width: 350px;
 }
@@ -365,6 +367,7 @@ h1 {
 .steps-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   font-size: 18px;
   color: #333;
