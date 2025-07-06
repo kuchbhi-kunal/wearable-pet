@@ -13,6 +13,9 @@ let isCriticallyHungryWeb = false; // New global variable to track hunger status
 
 const STEPS_PER_TREAT = 100;
 
+// Milliseconds in one day (24 hours * 60 minutes * 60 seconds * 1000 milliseconds)
+const ONE_DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
+
 let gameData = {
   convertedSteps: 0,
   totalTreats: 0,
@@ -174,7 +177,6 @@ async function fetchFitnessData() {
   let totalSteps = 0;
 
   try {
-    // CORRECTED: Call aggregate directly with the request body, no .post() needed, and removed 'resource' wrapper
     const stepsResponse = await gapi.client.fitness.users.dataset.aggregate({
       userId: "me",
       aggregateBy: [
@@ -184,8 +186,9 @@ async function fetchFitnessData() {
             "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
         },
       ],
+      // CORRECTED: Use durationMillis for bucketing by day
       bucketByTime: {
-        period: "day",
+        durationMillis: ONE_DAY_IN_MILLIS,
       },
       startTimeMillis: startTimeMillis,
       endTimeMillis: endTimeMillis,
@@ -406,8 +409,8 @@ async function fetchHungerLevel() {
 function showNotification(message, type) {
   const notification = document.createElement("div");
   notification.className = `notification ${type}`;
-  notification.textContent = message;
   document.body.appendChild(notification);
+  notification.textContent = message;
 
   setTimeout(() => {
     notification.classList.add("hide");
