@@ -261,7 +261,7 @@ function feedPet() {
       console.log("Feed response:", data);
 
       // Update treats count
-      if (typeof updateTreatsAfterFeed === "function") {
+      if (typeof updateTreatsAfterFeed === 'function') {
         updateTreatsAfterFeed();
       }
 
