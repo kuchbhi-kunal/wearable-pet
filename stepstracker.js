@@ -42,146 +42,158 @@ function updateDateIfNeeded() {
     gameData.lastUpdateDate = today;
     gameData.convertedSteps = 0; // Reset converted steps for new day
     saveGameData();
-    console.log("New day detected. Converted steps reset.");
   }
 }
 
-// New function to show/hide the loader
-function showStepLoader(show) {
-  const loader = document.getElementById("stepLoader");
-  if (loader) {
-    loader.style.display = show ? "inline" : "none";
-  }
-  const totalStepsValue = document.getElementById("totalStepsValue");
-  if (totalStepsValue) {
-    totalStepsValue.style.display = show ? "none" : "inline"; // Hide steps while loading
-  }
-}
+async function initializeGapi() {
+  try {
+    loadGameData();
 
-function initializeGapi() {
-  if (isInitialized) return;
-
-  gapi.client
-    .init({
-      discoveryDocs: [DISCOVERY_DOC],
-      clientId: CLIENT_ID,
-      scope: SCOPES,
-    })
-    .then(() => {
-      tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        callback: (tokenResponse) => {
-          if (tokenResponse && tokenResponse.access_token) {
-            gapi.client.setToken(tokenResponse);
-            fetchData();
-          } else {
-            console.error("Token response error:", tokenResponse);
-          }
-        },
-      });
-      isInitialized = true;
-      document.getElementById("connectBtn").textContent = "Refresh Steps"; // Change button text
-      fetchData(); // Attempt to fetch data on init
-    })
-    .catch((error) => {
-      console.error("Error initializing GAPI client:", error);
-      // document.getElementById("status").textContent = "Failed to load Google APIs.";
+    await new Promise((resolve) => {
+      gapi.load("client", resolve);
     });
+
+    await gapi.client.init({
+      discoveryDocs: [DISCOVERY_DOC],
+    });
+
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+      callback: async (response) => {
+        if (response.error) {
+          return;
+        }
+        await fetchData();
+      },
+    });
+
+    isInitialized = true;
+
+    // Call updateTreatsDisplay here to ensure button is shown on initial load if treats exist
+    updateTreatsDisplay();
+  } catch (error) {
+    console.error("Error initializing:", error);
+  }
 }
 
 function connectToGoogleFit() {
-  if (!tokenClient) {
-    console.error("Token client not initialized.");
+  if (!isInitialized) {
     return;
   }
   tokenClient.requestAccessToken();
 }
 
 async function fetchData() {
-  showStepLoader(true); // Show loader
-  // document.getElementById("status").textContent = "Fetching data...";
-  updateDateIfNeeded(); // Check for new day before fetching
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Start of today
-  const endOfDay = new Date();
-  endOfDay.setHours(23, 59, 59, 999); // End of today
-
-  const startTimeMillis = today.getTime();
-  const endTimeMillis = endOfDay.getTime();
-
   try {
-    // Steps data
-    const stepsResponse = await gapi.client.fitness.users.dataset.aggregate({
-      userId: "me",
-      resource: "dataset",
-      requestBody: {
-        aggregateBy: [
-          {
-            dataTypeName: "com.google.step_count.delta",
-            dataSourceId:
-              "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
-          },
-        ],
-        bucketByTime: { durationMillis: 86400000 }, // One day in milliseconds
-        startTimeMillis: startTimeMillis,
-        endTimeMillis: endTimeMillis,
-      },
-    });
+    updateDateIfNeeded();
+
+    const now = new Date();
+    const startOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+    const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
 
     let totalSteps = 0;
-    if (stepsResponse.result.bucket && stepsResponse.result.bucket.length > 0) {
-      for (const bucket of stepsResponse.result.bucket) {
-        if (bucket.dataset && bucket.dataset.length > 0) {
-          for (const dataset of bucket.dataset) {
+
+    const stepDataSources = [
+      "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
+      "derived:com.google.step_count.delta:com.google.android.gms:merge_step_deltas",
+    ];
+
+    for (const dataSource of stepDataSources) {
+      try {
+        const request = {
+          aggregateBy: [
+            {
+              dataTypeName: "com.google.step_count.delta",
+              dataSourceId: dataSource,
+            },
+          ],
+          bucketByTime: { durationMillis: 86400000 },
+          startTimeMillis: startOfDay.getTime(),
+          endTimeMillis: endOfDay.getTime(),
+        };
+
+        const response = await gapi.client.fitness.users.dataset.aggregate({
+          userId: "me",
+          resource: request,
+        });
+
+        if (response.result.bucket && response.result.bucket.length > 0) {
+          const bucket = response.result.bucket[0];
+          if (bucket.dataset && bucket.dataset.length > 0) {
+            const dataset = bucket.dataset[0];
             if (dataset.point && dataset.point.length > 0) {
-              totalSteps += dataset.point.reduce((sum, point) => {
+              const steps = dataset.point.reduce((sum, point) => {
                 return sum + (point.value[0].intVal || 0);
               }, 0);
+              if (steps > 0) {
+                totalSteps = Math.max(totalSteps, steps);
+                break;
+              }
             }
           }
         }
+      } catch (error) {
+        console.log("Step source failed:", error);
       }
     }
-    currentSteps = totalSteps; // Update global currentSteps
 
-    const stepsSinceLastConversion = currentSteps - gameData.convertedSteps;
-    availableTreats = Math.floor(stepsSinceLastConversion / STEPS_PER_TREAT);
+    const availableSteps = Math.max(0, totalSteps - gameData.convertedSteps);
+    availableTreats = Math.floor(availableSteps / STEPS_PER_TREAT);
+
+    currentSteps = availableSteps;
+
+    document.getElementById("connectBtn").style.display = "none";
+    document.getElementById("totalStepsValue").textContent =
+      totalSteps.toLocaleString();
+    document.getElementById("totalStepsValue").style.display = "inline";
 
     document.getElementById(
-      "totalStepsValue"
-    ).textContent = `${totalSteps.toLocaleString()} steps`; // Update actual steps display
+      "stepDisplay"
+    ).textContent = `${availableSteps.toLocaleString()} Steps available to convert`;
+    document.getElementById("stepDisplay").style.display = "block";
 
+    document.getElementById(
+      "availableTreats"
+    ).textContent = `${availableTreats} treats available`;
+    document.getElementById("availableTreats").style.display = "none";
+
+    if (availableTreats > 0) {
+      document.getElementById("convertBtn").style.display = "inline-block";
+    } else {
+      document.getElementById("convertBtn").style.display = "none";
+    }
+
+    // Call updateTreatsDisplay here after fetching data to ensure consistency
     updateTreatsDisplay();
-    // document.getElementById("status").textContent = "Data loaded successfully!";
   } catch (error) {
     console.error("Error fetching data:", error);
-    // document.getElementById("status").textContent =
-    //   "Error fetching data: " + error.message;
-  } finally {
-    showStepLoader(false); // Hide loader regardless of success or failure
   }
 }
 
+// New helper function to update the treats display and button
 function updateTreatsDisplay() {
-  document.getElementById("stepDisplay").textContent = `${(
-    currentSteps - gameData.convertedSteps
-  ).toLocaleString()} Steps available to convert`;
-  document.getElementById(
-    "availableTreats"
-  ).textContent = `${availableTreats} treat${
-    availableTreats !== 1 ? "s" : ""
-  } available`;
-
-  document.getElementById(
-    "totalTreats"
-  ).textContent = `Total treats: ${gameData.totalTreats}`;
-
-  if (availableTreats > 0) {
-    document.getElementById("convertBtn").style.display = "block";
+  const totalTreatsElement = document.getElementById("totalTreats");
+  if (gameData.totalTreats > 0) {
+    totalTreatsElement.innerHTML = `
+      Total Treats: ${gameData.totalTreats}
+      <button id="feedBtn" onclick="feedPet()" class="feed-btn">
+        Feed Pet
+      </button>
+    `;
+    totalTreatsElement.style.display = "flex";
   } else {
-    document.getElementById("convertBtn").style.display = "none";
+    totalTreatsElement.innerHTML = `Total Treats: 0`;
+    totalTreatsElement.style.display = "flex"; // Keep visible even if 0
+  }
+  // Disable feed button if no treats
+  const feedBtn = document.getElementById("feedBtn");
+  if (feedBtn) {
+    feedBtn.disabled = gameData.totalTreats === 0;
   }
 }
 
@@ -235,11 +247,9 @@ window.onload = function () {
       typeof google !== "undefined" &&
       google.accounts
     ) {
-      loadGameData(); // Load game data at the start
       initializeGapi();
     } else {
-      // document.getElementById("status").textContent = "Loading Google APIs...";
-      console.log("Loading Google APIs...");
+      setTimeout(arguments.callee, 500);
     }
   }, 100);
 };
